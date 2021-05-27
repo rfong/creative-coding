@@ -8,12 +8,12 @@ let randomSketch = new p5((sketch) => {
       timeout = 50, // millis
       squareSize = Math.ceil(1.0 * canvasSize / squaresPerSide);
 
-	function reset() {
+  function reset() {
     // square matrix w/ all values set to true
     onMat = _.map(_.range(squaresPerSide), ()=>{
       return _.map(_.range(squaresPerSide), ()=>{return true});
     });
-	}
+  }
   
   sketch.preload = () => {
     img = sketch.loadImage('https://images.unsplash.com/photo-1471922694854-ff1b63b20054?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1052&q=80');
@@ -21,20 +21,20 @@ let randomSketch = new p5((sketch) => {
   
   sketch.setup = () => {
     sketch.createCanvas(canvasSize, canvasSize);
-		reset();
+    reset();
   }
   
   // are we waiting for a timeout to complete?
-	// TODO we could do this with promise & deferred...
+  // TODO we could do this with promise & deferred...
   let turnIsQueued = false;
   
   sketch.draw = () => {
-		// if next turn is already queued, do nothing / skip this draw loop
-		if (turnIsQueued) { return; }
+    // if next turn is already queued, do nothing / skip this draw loop
+    if (turnIsQueued) { return; }
 
-		// redraw image
+    // redraw image
     sketch.image(img, 0, 0);
-		// stroke/fill settings
+    // stroke/fill settings
     sketch.noStroke();
     sketch.fill(sketch.color(0,0,0));
     // redraw squares
@@ -44,15 +44,15 @@ let randomSketch = new p5((sketch) => {
     setTimeout(function() {
       turnRandomSquare();
       turnIsQueued = false;
-			// subtle speedup as the canvas becomes saturated w/ revealed squares 
+      // subtle speedup as the canvas becomes saturated w/ revealed squares 
       if (randInt(Math.pow(squaresPerSide, 2)/timeout) == 0) { timeout--; }
     }, timeout);
 
-		// next turn is now queued.
+    // next turn is now queued.
     turnIsQueued = true;
   }
   
-	// redraw all active squares
+  // redraw all active squares
   function drawSquares() {
     if (showAll) { return; }
     for (i in onMat) {
@@ -66,19 +66,19 @@ let randomSketch = new p5((sketch) => {
  
   // count number of deactivated squares in matrix
   function countNumOff() {
-		return _.sumBy(onMat, (row) => {
-			return _.sumBy(row, (b) => { return b ? 0 : 1; });
-		});
+    return _.sumBy(onMat, (row) => {
+      return _.sumBy(row, (b) => { return b ? 0 : 1; });
+    });
   }
   
   // pick random unturned square
-	// easy approach: just retry if we pick one that's already turned.
-	// becomes more suboptimal as time goes on, but it won't be human-perceptible
+  // easy approach: just retry if we pick one that's already turned.
+  // becomes more suboptimal as time goes on, but it won't be human-perceptible
   function turnRandomSquare() {
     if (isAllDone()) {
-			reset();
-			return;
-		}
+      reset();
+      return;
+    }
     let i = randInt(onMat.length),
         j = randInt(onMat[0].length);
     if (onMat[i][j] == false) {
@@ -88,7 +88,7 @@ let randomSketch = new p5((sketch) => {
   
   // check if matrix is completely falsy
   function isAllDone() {
-		return !_.some(_.map(onMat, _.some));
+    return !_.some(_.map(onMat, _.some));
   }
 
   // return a random integer in interval [0, n)

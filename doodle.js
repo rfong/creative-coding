@@ -9,8 +9,8 @@ function setup() {
 }
 
 function clearCanvas() {
-	clear();
-	background(256);
+  clear();
+  background(256);
 }
 
 let mouseIsDown = false;

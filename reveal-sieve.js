@@ -1,9 +1,9 @@
 let iterRevealSketchFactory = (getIterator, squaresPerSide, timeout, htmlElementId) => {
-	return new p5((sketch) => {
+  return new p5((sketch) => {
 
     let img,
         showAll = false,
-				iterator,
+        iterator,
         onMat, // bool matrix of whether squares are active
         canvasSize = 600,
         squareSize = Math.ceil(1.0 * canvasSize / squaresPerSide);
@@ -14,17 +14,17 @@ let iterRevealSketchFactory = (getIterator, squaresPerSide, timeout, htmlElement
     
     sketch.setup = () => {
       sketch.createCanvas(canvasSize, canvasSize);
-			resetState();
+      resetState();
     }
 
-		function resetState() {
-			iterator = getIterator();
+    function resetState() {
+      iterator = getIterator();
 
-    	// square matrix w/ all values set to true
-    	onMat = _.map(_.range(squaresPerSide), ()=>{
-      	return _.map(_.range(squaresPerSide), ()=>{return true});
-    	});
-		}
+      // square matrix w/ all values set to true
+      onMat = _.map(_.range(squaresPerSide), ()=>{
+        return _.map(_.range(squaresPerSide), ()=>{return true});
+      });
+    }
     
     // are we waiting for a timeout to complete?
     // TODO we could do this with promise & deferred...
@@ -76,12 +76,12 @@ let iterRevealSketchFactory = (getIterator, squaresPerSide, timeout, htmlElement
     function turnNextSquare() {
       if (isAllDone()) return;
       coords = iterator.next();
-			// if iterator runs out, reset it.
-			if (coords == null) {
-				console.log("regenerate iterator");
-				resetState();
-				coords = iterator.next();
-			}
+      // if iterator runs out, reset it.
+      if (coords == null) {
+        console.log("regenerate iterator");
+        resetState();
+        coords = iterator.next();
+      }
       onMat[coords[0]][coords[1]] = false;
     }
     
@@ -105,14 +105,14 @@ function getSieveIterator(squareSize) {
   return {
     // groups of multiples, in descending order of their associated prime
     sieve: _.map(
-				generatePrimeSieve(Math.pow(squareSize, 2)),
+        generatePrimeSieve(Math.pow(squareSize, 2)),
         (v, k) => {return v}),
     next: function() {
       // If current group is empty, proceed to next one.
       while (this.sieve.length > 0 && (!this.sieve[0] || this.sieve[0].length == 0)) {
-				this.sieve.shift(); // dequeue first group
+        this.sieve.shift(); // dequeue first group
       }
-			// Check if done.
+      // Check if done.
       if (!this.sieve[0] || this.sieve.length == 0) {
         return null;
       }
@@ -124,11 +124,11 @@ function getSieveIterator(squareSize) {
 
 // a SieveIterator that provides elements in reverse order.
 function getReverseSieveIterator(squareSize) {
-	let iter = getSieveIterator(squareSize);
-	iter.sieve = _.reverse(_.map(
+  let iter = getSieveIterator(squareSize);
+  iter.sieve = _.reverse(_.map(
     generatePrimeSieve(Math.pow(squareSize, 2)),
     (v, k) => {return _.reverse(v)}));
-	return iter;
+  return iter;
 }
 
 // generate a prime sieve up to maxN, grouped by prime : [multiples]
@@ -170,15 +170,15 @@ function intToCoords(x, sqSize) {
 let sqSize = 20;
 
 let sieveSketch = iterRevealSketchFactory(
-	() => { return getSieveIterator(sqSize) },
-	sqSize,
-	1, // timeout
-	'p5-sieve',
+  () => { return getSieveIterator(sqSize) },
+  sqSize,
+  1, // timeout
+  'p5-sieve',
 );
 
 let revSieveSketch = iterRevealSketchFactory(
-	() => { return getReverseSieveIterator(sqSize) },
-	sqSize,
-	1, // timeout
-	'p5-rev-sieve',
+  () => { return getReverseSieveIterator(sqSize) },
+  sqSize,
+  1, // timeout
+  'p5-rev-sieve',
 )

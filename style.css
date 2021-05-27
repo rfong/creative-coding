@@ -1,14 +1,14 @@
 html, body {
-	position: relative;
+  position: relative;
   margin: 0;
   padding: 20px;
 
-	font-family: 'Courier New', monospace;
+  font-family: 'Courier New', monospace;
 }
 canvas {
   display: block;
 }
 
 .footnote {
-	font-style: italic;
+  font-style: italic;
 }
