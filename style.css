@@ -1,0 +1,14 @@
+html, body {
+	position: relative;
+  margin: 0;
+  padding: 20px;
+
+	font-family: 'Courier New', monospace;
+}
+canvas {
+  display: block;
+}
+
+.footnote {
+	font-style: italic;
+}
