@@ -8,10 +8,12 @@ let randomSketch = new p5((sketch) => {
       timeout = 50, // millis
       squareSize = Math.ceil(1.0 * canvasSize / squaresPerSide);
 
-  // square matrix w/ all values set to true
-  onMat = _.map(_.range(squaresPerSide), ()=>{
-    return _.map(_.range(squaresPerSide), ()=>{return true});
-  });
+	function reset() {
+    // square matrix w/ all values set to true
+    onMat = _.map(_.range(squaresPerSide), ()=>{
+      return _.map(_.range(squaresPerSide), ()=>{return true});
+    });
+	}
   
   sketch.preload = () => {
     img = sketch.loadImage('https://images.unsplash.com/photo-1471922694854-ff1b63b20054?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1052&q=80');
@@ -19,6 +21,7 @@ let randomSketch = new p5((sketch) => {
   
   sketch.setup = () => {
     sketch.createCanvas(canvasSize, canvasSize);
+		reset();
   }
   
   // are we waiting for a timeout to complete?
@@ -72,7 +75,10 @@ let randomSketch = new p5((sketch) => {
 	// easy approach: just retry if we pick one that's already turned.
 	// becomes more suboptimal as time goes on, but it won't be human-perceptible
   function turnRandomSquare() {
-    if (isAllDone()) return;
+    if (isAllDone()) {
+			reset();
+			return;
+		}
     let i = randInt(onMat.length),
         j = randInt(onMat[0].length);
     if (onMat[i][j] == false) {
