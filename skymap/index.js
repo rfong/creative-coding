@@ -1,13 +1,11 @@
 // Modified from example by https://www.tetoki.eu/asciiart/ to accept ES6
-// imports, use p5 instance mode instead of global mode
+// imports and use p5 instance mode instead of global mode.
 
 import _ from 'lodash';
-import colors from 'ansi-colors';
 import p5 from 'p5';
 import {AsciiArt} from './lib/p5.asciiart';
 
 p5.prototype.AsciiArt = AsciiArt;
-
 
 const sketch = (p) => {
 
@@ -167,20 +165,23 @@ function mouseReleased() {
 /*
   *****************************************************************************
   ******************************** typeArray2d ********************************
-  Slightly reworked part of the oryginal code from the ASCII Art library - you
+  Slightly reworked part of the original code from the ASCII Art library - you
   can redesign this to suit your needs.
   *****************************************************************************
-  A simple function to help us print the ASCII Art on the screen. The function
-  prints a two-dimensional array of glyphs and it is used similarly to the
-  standard method of displaying images. It can be used in versions with 2, 4 or
-  6 parameters. When using the version with 2 parameters, the function assumes
-  that the width and height of the printed text block is equal to the width and
-  height of the working space (that's mean: equal to the _dst size) and it
-  starts drawing from upper left corner (coords: 0, 0). When using the version
-  with 4 parameters, the function assumes that the width and height of the
-  printed text block is equal to the width and height of the working space
-  (that's mean: equal to the _dst size). _arr2d is the two-dimensional array of
-  glyphs, _dst is destinetion (basically anything with 'canvas' property, such
+  A simple function to help us print the ASCII Art on the screen.
+
+  The function prints a two-dimensional array of glyphs and it is used 
+  similarly to the standard method of displaying images. It can be used in 
+  versions with 2, 4 or 6 parameters.
+  - typeArray2d(_arr2d, _dst, _x, _y)
+    _w, _h default to the dimensions of _dst, the working space.
+  - typeArray2d(_arr2d, _dst)
+    _w, _h default as above
+    _x, _y default to (0,0), the upper left corner
+
+  Parameters:
+  - _arr2d is the two-dimensional array of glyphs,
+  - _dst is destination (basically anything with 'canvas' property, such
   as p5js sketch or p5.Graphics).
 */
 AsciiArt.prototype.typeArray2d = function(_arr2d, _dst, _x, _y, _w, _h) {
@@ -224,6 +225,7 @@ AsciiArt.prototype.typeArray2d = function(_arr2d, _dst, _x, _y, _w, _h) {
     console.log('[typeArray2d] _dst canvas 2d context is undefined');
     return;
   }
+  temp_ctx2d.fillStyle = "cyan";
   var dist_hor = _w / _arr2d.length;
   var dist_ver = _h / _arr2d[0].length;
   var offset_x = _x + dist_hor * 0.5;
