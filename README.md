@@ -1,8 +1,9 @@
-# p5 sketches
+# [p5 sketches](https://rfong.github.io/rc-sandbox/creative-coding/p5/)
 -----
 
-Setup: `npm install`
-Dev server: `npm run start`
+## Development
+- Setup: `npm install`
+- Dev server: `npm run start`
 
 ## Resources
 - [p5](https://p5js.org/)
