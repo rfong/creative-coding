@@ -146,12 +146,6 @@ p.draw = function() {
       used as a base for your own experiments.
     */
     myAsciiArt.typeArray2d(ascii_arr, this);
-    /*
-      Finally, let's display the source image, too.
-    */
-    p.tint(255, p.pow(1.0 - (cyclic_t % 1.0), 4) * 255);
-    p.image(images[p.floor(cyclic_t)], 0, 0, p.width, p.height);
-    p.noTint();
 }
 
 function mouseReleased() {
@@ -225,18 +219,21 @@ AsciiArt.prototype.typeArray2d = function(_arr2d, _dst, _x, _y, _w, _h) {
     console.log('[typeArray2d] _dst canvas 2d context is undefined');
     return;
   }
-  temp_ctx2d.fillStyle = "cyan";
   var dist_hor = _w / _arr2d.length;
   var dist_ver = _h / _arr2d[0].length;
   var offset_x = _x + dist_hor * 0.5;
   var offset_y = _y + dist_ver * 0.5;
-  for(var temp_y = 0; temp_y < _arr2d[0].length; temp_y++)
-    for(var temp_x = 0; temp_x < _arr2d.length; temp_x++)
+
+  for(var temp_y = 0; temp_y < _arr2d[0].length; temp_y++) {
+    for(var temp_x = 0; temp_x < _arr2d.length; temp_x++) {
+      temp_ctx2d.fillStyle = `rgb(${Math.floor(temp_x*2)}, ${Math.floor(temp_y*1.5)}, 255)`;
       temp_ctx2d.fillText(
         _arr2d[temp_x][temp_y],
         offset_x + temp_x * dist_hor,
         offset_y + temp_y * dist_ver
       );
+		}
+	}
 }
 
 }; // end sketch
