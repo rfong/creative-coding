@@ -1,7 +1,7 @@
 // Modified from example by https://www.tetoki.eu/asciiart/ to accept ES6
 // imports and use p5 instance mode instead of global mode.
 
-import _ from 'lodash';
+//import _ from 'lodash';
 import p5 from 'p5';
 import {AsciiArt} from './lib/p5.asciiart';
 
