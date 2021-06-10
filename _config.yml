@@ -1,1 +1,1 @@
-include: [skymap/dist/_snowpack/]
+include: ['skymap/dist/_snowpack/']
