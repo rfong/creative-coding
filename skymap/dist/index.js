@@ -2,7 +2,7 @@
 // imports and use p5 instance mode instead of global mode.
 
 //import _ from 'lodash';
-import p5 from './_snowpack/pkg/p5.js';
+import p5 from './snowpack/pkg/p5.js';
 import {AsciiArt} from './lib/p5.asciiart.js';
 
 p5.prototype.AsciiArt = AsciiArt;
