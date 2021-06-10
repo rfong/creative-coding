@@ -70,7 +70,7 @@ imports.
     new AsciiArt(_sketch, _fontName, _fontSize);
     new AsciiArt(_sketch, _fontName, _fontSize, _textStyle);
 */
-export function AsciiArt(_sketch, _fontName, _fontSize, _textStyle) {
+let AsciiArt = function(_sketch, _fontName, _fontSize, _textStyle) {
   /*
     "Private" variables storing information about the parent sketch name, size
     and style of the font used to create the table containing glyphs sorted by
@@ -436,3 +436,5 @@ AsciiArt.prototype.__convert = function() {
   if(this.__automaticPixelsDataTransferFlag) this.__graphics.updatePixels();
   return temp_result;
 }
+
+export { AsciiArt };
