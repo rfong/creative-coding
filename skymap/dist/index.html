@@ -25,16 +25,16 @@ uniform vec2 iResolution;
 
 // Return a sinusoidal time-based oscillator normalized to [0.0, 1.0]
 float timeOsc(float speedMultiplier) {
-	return sin(iTime * speedMultiplier) / 2. + .5;
+  return sin(iTime * speedMultiplier) / 2. + .5;
 }
 
 // Normalize output to [0., 1.]
 float unitSin(float radians) {
-	return sin(radians) / 2. + .5;
+  return sin(radians) / 2. + .5;
 }
 // Normalize output to [0., 1.]
 float unitCos(float radians) {
-	return cos(radians) / 2. + .5;
+  return cos(radians) / 2. + .5;
 }
 // Get FragCoord X and Y normalized to [0., 1.]
 float unitX() { return gl_FragCoord.x / iResolution.x; }
@@ -43,14 +43,14 @@ float unitY() { return gl_FragCoord.y / iResolution.y; }
 // Sinusoidally interpolate between 2 colors over time.
 // TODO: derive one-line sum of phase-shifted sines?
 vec3 interpolateOsc(float v, vec3 color1, vec3 color2) {
-	return (
-		color1 * unitSin(TAU*(v + iTime/4.)) +
-		color2 * unitSin(TAU*(v + iTime/4. + 0.5))
-	);
+  return (
+    color1 * unitSin(TAU*(v + iTime/4.)) +
+    color2 * unitSin(TAU*(v + iTime/4. + 0.5))
+  );
 }
 
 float sphericalShadow(float v) {
-	return sin(v * TAU / 2.5);
+  return sin(v * TAU / 2.5);
 }
 
 // We'll interpolate between these two colors as the extremes.
@@ -59,7 +59,7 @@ const vec3 color2 = vec3(113., 13., 170.)/256.; // indigo
 
 void main() {
   gl_FragColor = vec4(
-		interpolateOsc(unitX(), color1, color2) * sphericalShadow(unitY()),
+    interpolateOsc(unitX(), color1, color2) * sphericalShadow(unitY()),
     1.
   );
 }
@@ -72,19 +72,19 @@ void main() {
     <h1>skymap: ASCII + GLSL fragment shader</h1>
 
     <p>prompt: "emphasize differences" / "make a clock"</p>
-		<p>My original idea was to make a world map colored by a shader that interpolated the color of the sky in that part of the world. Ended up just making a shifting color gradient.</p>
-    <p>Decided to do it with CSS filters and WebGL fragment shaders for performance reasons, and for fun.</p>
+    <p>My original idea was to make a world map colored by a shader that interpolated the color of the sky in that part of the world. Ended up just making a shifting color gradient.</p>
+    <p>The ASCII map is just plain monospace text in HTML, with a CSS filter that masks the WebGL fragment shader canvas using the inverse of the text. It feels elegant and it's also super performant on my machine compared to p5!</p>
 
     <!-- The aalib pipeline will render here. -->
     <div id="ascii-render"></div>
     <!-- Our data bound here. -->
     <div id="skymap-wrapper"><div id="skymap">
-			<canvas id="skymap-canvas"></canvas>
-			<!-- Rows to be appended here. -->
+      <canvas id="skymap-canvas"></canvas>
+      <!-- Rows to be appended here. -->
     </div></div>
 
-		<p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
-		<p>Also referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to turn text into a mask for a layer beneath.</p>
+    <p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
+    <p>Also referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to use a text layer as a mask for a layer beneath.</p>
 
   </body>
 </html>
