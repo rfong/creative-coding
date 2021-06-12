@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+	// Force canvas dimensions. It's spontaneously resizing in prod for reasons
+	// I cannot fathom
+	$('#skymap-canvas').width = 1101;
+	$('#skymap-canvas').height = 810;
+
   // `aalib` doesn't have a prebuilt way to internally render the ASCII it
   // generates to a string, so we're going to render it invisibly, extract the
   // HTML, then operate upon it as data.
