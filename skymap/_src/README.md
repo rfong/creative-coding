@@ -8,6 +8,8 @@ npm install
 ```
 
 ## Development
+I'm using `snowpack` for ES6 compatibility and bundling. Sadly, it is only 
+strictly necessary for the first draft.
 ```
 npm run start
 ```
@@ -16,7 +18,7 @@ npm run start
 - Snowpack failing to clear cache? Try `npx snowpack dev --reload`
 
 ## Bundling
-Until I get a resolution to [issue#3441](https://github.com/snowpackjs/snowpack/issues/3441), I'm using an extremely janky bash approach.
+Until I get a resolution to [issue#3441](https://github.com/snowpackjs/snowpack/issues/3441), I'm using an extremely janky bash approach. Use this script instead of the `npm` command.
 ```
 ./build.sh
 ```

@@ -9,6 +9,10 @@ canvas {
   display: block;
 }
 
+p, ul {
+	max-width: 800px;
+}
+
 .footnote {
   font-style: italic;
 }

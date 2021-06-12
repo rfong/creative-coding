@@ -72,13 +72,8 @@ void main() {
     <h1>skymap: ASCII + GLSL fragment shader</h1>
 
     <p>prompt: "emphasize differences" / "make a clock"</p>
-		<p>My original idea was to make an ASCII (because why not) world map colored by a shader that interpolated the color of the sky in that part of the world. Ended up just making a shifting color gradient.</p>
-    <p>Used <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image -> ASCII conversion, outputted the map ASCII to plain HTML.</p>
-    <p>I didn't want to take the performance hit from naively coloring individual characters with CSS, so I decided to do it with CSS filters and WebGL fragment shaders.</p>
-    <ul>
-      <li><a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">This helpful guide</a> on CSS mix-blend-mode showed me how to use the text layer as a filter for something underneath.</li>
-      <li><a href="https://github.com/xemantic/shader-web-background">xemantic's shader-web-background</a> was the simplest way I could find to get a fragment shader up and running without fuss.</li>
-    </ul>
+		<p>My original idea was to make a world map colored by a shader that interpolated the color of the sky in that part of the world. Ended up just making a shifting color gradient.</p>
+    <p>Decided to do it with CSS filters and WebGL fragment shaders for performance reasons and for fun.</p>
 
     <!-- The aalib pipeline will render here. -->
     <div id="ascii-render"></div>
@@ -88,7 +83,11 @@ void main() {
 			<!-- Rows to be appended here. -->
     </div></div>
 
-		<p>Tools used: </p>
+		<p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading.</p>
+		<p>Other helpful resources:</p>
+    <ul>
+			<li>Referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to turn text into a mask for a layer beneath.</li>
+		</ul>
 
   </body>
 </html>
