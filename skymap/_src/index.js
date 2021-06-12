@@ -1,11 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-var app = angular.module('SkymapApp', []);
-
-app.controller('SkymapCtrl', function($scope, $http) {
-
-  $scope.skymapData = [];
-
   // `aalib` doesn't have a prebuilt way to internally render the ASCII it
   // generates to a string, so we're going to render it invisibly, extract the
   // HTML, then operate upon it as data.
@@ -21,14 +15,13 @@ app.controller('SkymapCtrl', function($scope, $http) {
 
   // This runs after the aalib renderer is done.
   function postRender() {
-		// Extract ASCII from the aalib render and put it into angular scope.
-    $scope.skymapData = $('#ascii-render').html().split("\n");
-    $scope.$apply();
+		// Extract ASCII from the aalib render and reformat it
+    _.each($('#ascii-render').html().split('\n'), function(row) {
+      $('#skymap').append('<pre class="row">' + row + '</pre>');
+    });
     $('#ascii-render').html("");
 		setupShader();
   }
-
-}); // end SkymapCtrl
 
 }); // end document ready
 
