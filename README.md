@@ -1,6 +1,7 @@
-# [p5 sketches](https://rfong.github.io/rc-sandbox/creative-coding/p5/)
+# [creative-coding](https://rfong.github.io/creative-coding)
 -----
 
 ## Resources
 - [p5](https://p5js.org/)
 - [p5 instance vs. global mode](https://github.com/processing/p5.js/wiki/Global-and-instance-mode)
+- [A collection of WebGL and WebGPU frameworks and libraries](https://gist.github.com/dmnsgn/76878ba6903cf15789b712464875cfdc)
