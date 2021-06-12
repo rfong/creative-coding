@@ -1,0 +1,30 @@
+#ascii-render {
+  display: none;
+}
+#skymap {
+  overflow: none;
+  width: auto;
+  color: #000;
+  background-color: #f00;
+  font-size: 9px;
+  /* Don't display until explicitly set */
+  display: none;
+}
+#skymap pre.row {
+  color: #fff;
+  background: #000;
+  mix-blend-mode: multiply;
+  margin: 0;
+  line-height: 1em;
+  letter-spacing: 0.2em;
+}
+#skymap .char {
+  display: inline-block;
+}
+#skymap.visible {
+  /* forces the div to resize to the width of content */
+  display: inline-block;
+}
+#skymap-canvas {
+  position: absolute;
+}

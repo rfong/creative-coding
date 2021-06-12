@@ -1,22 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      ng-app="SkymapApp"
+      ng-controller="SkymapCtrl">
   <head>
-    <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="utf-8" />
 
-    <script type="module" src="lib/p5.asciiart.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="index.css" />
 
-		<!-- `type="module"` is necessary to use ES modules -->
-		<script type="module" src="./index.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"></script>
+    <script type="text/javascript" src="./lib/aalib.js"></script>
+    <script type="text/javascript" src="./lib/shader-web-background.min.js"></script>
+
+    <!-- `type="module"` is necessary to use ES modules -->
+    <script src="./index.js"></script>
+
+    <script type="x-shader/x-fragment" id="bg">
+precision highp float;
+uniform float iTime;
+    
+void main() {
+  gl_FragColor = vec4(
+    mod(gl_FragCoord.x / 256., 1.),
+    mod((gl_FragCoord.x + gl_FragCoord.y - iTime * 40.) / 256. , 1.),
+    mod(gl_FragCoord.y / 256., 1.),
+    1.
+  );
+}
+    </script>
 
   </head>
   <body>
-    <a href="../.."><< back</a>
+    <a href="../.."><< back</a> | <b>current</b> | <a href="p5">draft</a>
 
-    <h1>skymap</h1>
-    <p>prompt: "emphasize differences" / "make a clock"</p>
+    <h1>skymap: ASCII + GLSL fragment shader</h1>
 
-    <div id="p5"></div>
-    <!--<p class="footnote">RC creative coding meetup, 2021-06-09</p>-->
+    <p>I did another draft with plain HTML as the map display using <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image -> ASCII conversion.</p>
+    <p>I didn't want to take the performance hit from naively coloring individual characters with CSS, so I decided to do it with CSS filters and WebGL fragment shaders.</p>
+    <ul>
+      <li><a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">This helpful guide</a> on CSS mix-blend-mode showed me how to use the text layer as a filter for something underneath.</li>
+      <li><a href="https://github.com/xemantic/shader-web-background">xemantic's shader-web-background</a> was the simplest way I could find to get a fragment shader up and running without fuss.</li>
+    </ul>
+
+    <!-- The aalib pipeline will render here. -->
+    <div id="ascii-render"></div>
+    <!-- Our data bound here. -->
+    <div id="skymap-wrapper"><div id="skymap"
+         ng-class="{'visible': skymapData.length > 0}">
+			<canvas id="skymap-canvas" width="1101" height="810"></canvas>
+      <pre class="row"
+           ng-repeat="row in skymapData track by $index"
+        >{{row}}</pre>
+    </div></div>
+
   </body>
 </html>
