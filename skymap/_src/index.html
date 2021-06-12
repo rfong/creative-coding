@@ -20,12 +20,49 @@
     <script type="x-shader/x-fragment" id="bg">
 precision highp float;
 uniform float iTime;
-    
+uniform vec2 iResolution;
+#define PI 3.14159265358979
+#define TAU 2.*PI
+
+// Return a sinusoidal time-based oscillator normalized to [0.0, 1.0]
+float timeOsc(float speedMultiplier) {
+	return sin(iTime * speedMultiplier) / 2. + .5;
+}
+
+// Normalize output to [0., 1.]
+float unitSin(float radians) {
+	return sin(radians) / 2. + .5;
+}
+// Normalize output to [0., 1.]
+float unitCos(float radians) {
+	return cos(radians) / 2. + .5;
+}
+// Get FragCoord X and Y normalized to [0., 1.]
+float unitX() { return gl_FragCoord.x / iResolution.x; }
+float unitY() { return gl_FragCoord.y / iResolution.y; }
+
+// Sinusoidally interpolate between 2 colors over time.
+// TODO: derive one-line sum of phase-shifted sines?
+vec3 interpolateOsc(float v, vec3 color1, vec3 color2) {
+	return (
+		color1 * unitSin(TAU*(v + iTime/4.)) +
+		color2 * unitSin(TAU*(v + iTime/4. + 0.5))
+	);
+}
+
+float sphericalShadow(float v) {
+	return sin(v * TAU / 2.5);
+}
+
+// We'll interpolate between these two colors as the extremes.
+const vec3 color1 = vec3(0., 220., 255.)/256.; // teal
+const vec3 color2 = vec3(113., 13., 170.)/256.; // indigo
+
 void main() {
   gl_FragColor = vec4(
-    mod(gl_FragCoord.x / 256., 1.),
-    mod((gl_FragCoord.x + gl_FragCoord.y - iTime * 40.) / 256. , 1.),
-    mod(gl_FragCoord.y / 256., 1.),
+		interpolateOsc(unitX(), color1, color2) * sphericalShadow(unitY()),
+    //0.,
+    //0.8,
     1.
   );
 }
@@ -33,11 +70,13 @@ void main() {
 
   </head>
   <body>
-    <a href="../.."><< back</a> | <b>current</b> | <a href="p5">draft</a>
+    <a href="../.."><< back</a> | <b>current</b> | <a href="p5.html">draft</a>
 
     <h1>skymap: ASCII + GLSL fragment shader</h1>
 
-    <p>I did another draft with plain HTML as the map display using <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image -> ASCII conversion.</p>
+    <p>prompt: "emphasize differences" / "make a clock"</p>
+		<p>My original idea was to make an ASCII (because why not) world map colored by a shader that interpolated the color of the sky in that part of the world. Ended up just making a shifting color gradient.</p>
+    <p>Used <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image -> ASCII conversion, outputted the map ASCII to plain HTML.</p>
     <p>I didn't want to take the performance hit from naively coloring individual characters with CSS, so I decided to do it with CSS filters and WebGL fragment shaders.</p>
     <ul>
       <li><a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">This helpful guide</a> on CSS mix-blend-mode showed me how to use the text layer as a filter for something underneath.</li>
@@ -54,6 +93,8 @@ void main() {
            ng-repeat="row in skymapData track by $index"
         >{{row}}</pre>
     </div></div>
+
+		<p>Tools used: </p>
 
   </body>
 </html>

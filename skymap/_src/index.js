@@ -37,6 +37,7 @@ function setupShader() {
     shaders: {
       bg: {
         uniforms: {
+          iResolution: (gl, loc, ctx) => gl.uniform2f(loc, ctx.width, ctx.height),
           iTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000),
         },
       },
