@@ -28,3 +28,4 @@ Until I get a resolution to [issue#3441](https://github.com/snowpackjs/snowpack/
 - [Getting started with WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL)
 - [A collection of WebGL and WebGPU frameworks and libraries](https://gist.github.com/dmnsgn/76878ba6903cf15789b712464875cfdc)
 - [Q: How to load shaders from external file? (A: AJAX)](https://github.com/mrdoob/three.js/issues/283)
+- [Sunrise equation](https://en.wikipedia.org/wiki/Sunrise_equation)

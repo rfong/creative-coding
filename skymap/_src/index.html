@@ -11,10 +11,12 @@
     <script type="text/javascript" src="./lib/aalib.js"></script>
     <script type="text/javascript" src="./lib/shader-web-background.min.js"></script>
 
-    <!-- `type="module"` is necessary to use ES modules -->
     <script src="./index.js"></script>
 
     <script type="x-shader/x-fragment" id="bg">
+// Unfortunately, this must be defined within the HTML unless I want to incur
+// latency by AJAXing it.
+
 precision highp float;
 uniform float iTime;
 uniform vec2 iResolution;
@@ -58,8 +60,6 @@ const vec3 color2 = vec3(113., 13., 170.)/256.; // indigo
 void main() {
   gl_FragColor = vec4(
 		interpolateOsc(unitX(), color1, color2) * sphericalShadow(unitY()),
-    //0.,
-    //0.8,
     1.
   );
 }
@@ -73,7 +73,7 @@ void main() {
 
     <p>prompt: "emphasize differences" / "make a clock"</p>
 		<p>My original idea was to make a world map colored by a shader that interpolated the color of the sky in that part of the world. Ended up just making a shifting color gradient.</p>
-    <p>Decided to do it with CSS filters and WebGL fragment shaders for performance reasons and for fun.</p>
+    <p>Decided to do it with CSS filters and WebGL fragment shaders for performance reasons, and for fun.</p>
 
     <!-- The aalib pipeline will render here. -->
     <div id="ascii-render"></div>
@@ -83,11 +83,8 @@ void main() {
 			<!-- Rows to be appended here. -->
     </div></div>
 
-		<p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading.</p>
-		<p>Other helpful resources:</p>
-    <ul>
-			<li>Referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to turn text into a mask for a layer beneath.</li>
-		</ul>
+		<p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
+		<p>Also referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to turn text into a mask for a layer beneath.</p>
 
   </body>
 </html>
