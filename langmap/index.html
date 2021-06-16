@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="index.css" />
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="./lib/aalib.js"></script>
+    <script type="text/javascript" src="./lib/shader-web-background.min.js"></script>
+
+    <script src="./index.js"></script>
+
+    <script type="x-shader/x-fragment" id="bg">
+// Unfortunately, this must be defined within the HTML unless I want to incur
+// latency by AJAXing it.
+
+precision highp float;
+uniform float iTime;
+uniform vec2 iResolution;
+
+#define PI 3.14159265358979
+#define TAU 2.*PI
+
+// Highlighting vars. Note that GL's (0,0) is in the bottom left.
+uniform vec2 highlightCoord; // Coordinate to be highlighted
+uniform vec2 coordDimensions; // x,y size of a "pixel" in actual pixels
+uniform vec3 highlightRGB; // RGB float value of highlight color (max=1.0)
+
+// Return a sinusoidal time-based oscillator normalized to [0.0, 1.0]
+float timeOsc(float speedMultiplier) {
+  return sin(iTime * speedMultiplier) / 2. + .5;
+}
+
+// Normalize output to [0., 1.]
+float unitSin(float radians) {
+  return sin(radians) / 2. + .5;
+}
+// Normalize output to [0., 1.]
+float unitCos(float radians) {
+  return cos(radians) / 2. + .5;
+}
+// Get FragCoord X and Y normalized to [0., 1.]
+float unitX() { return gl_FragCoord.x / iResolution.x; }
+float unitY() { return gl_FragCoord.y / iResolution.y; }
+
+// Sinusoidally interpolate between 2 colors over time.
+// TODO: derive one-line sum of phase-shifted sines?
+vec3 interpolateOsc(float v, vec3 color1, vec3 color2) {
+  return (
+    color1 * unitSin(TAU*(v + iTime/4.)) +
+    color2 * unitSin(TAU*(v + iTime/4. + 0.5))
+  );
+}
+
+float sphericalShadow(float v) {
+  return sin(v * TAU / 2.5);
+}
+
+// Get the coordinates of the current "pixel" unit we are inside.
+vec2 getCoord() {
+	return vec2(
+		floor(1.0 * gl_FragCoord.x / coordDimensions.x),
+		floor(1.0 * gl_FragCoord.y / coordDimensions.y)
+	);
+}
+
+bool isHighlighted() {
+	vec2 myCoord = getCoord();
+	return myCoord.x == highlightCoord.x && myCoord.y == highlightCoord.y;
+}
+
+// We'll interpolate between these two colors as the extremes.
+const vec3 color1 = vec3(0., 220., 255.)/256.; // teal
+const vec3 color2 = vec3(113., 13., 170.)/256.; // indigo
+
+void main() {
+	// If current pixel is supposed to be highlighted, hardcode it
+	if (isHighlighted()) {
+		gl_FragColor = vec4(highlightRGB, 1.);
+		return;
+	}
+	// Otherwise, run the oscillating animation
+  gl_FragColor = vec4(
+    interpolateOsc(unitX(), color1, color2) * sphericalShadow(unitY()),
+    1.
+  );
+}
+    </script>
+
+  </head>
+  <body>
+    <a href="../.."><< back</a>
+
+    <h1>[WIP] langmap: IPA geographic visualizer in GLSL</h1>
+
+    <!-- The aalib pipeline will render here. -->
+    <div id="ascii-render"></div>
+    <!-- Our data bound here. -->
+    <div id="skymap-wrapper"><div id="skymap">
+      <canvas id="skymap-canvas"></canvas>
+      <!-- Rows to be appended here. -->
+    </div></div>
+
+    <p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
+    <p>Also referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to use a text layer as a mask for a layer beneath.</p>
+
+  </body>
+</html>
