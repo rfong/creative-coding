@@ -25,7 +25,7 @@ uniform vec2 iResolution;
 #define TAU 2.*PI
 
 // Highlighting vars. Note that GL's (0,0) is in the bottom left.
-uniform vec2 highlightCoord; // Coordinate to be highlighted
+uniform vec2 highlightCoords; // Coordinate to be highlighted
 uniform vec2 coordDimensions; // x,y size of a "pixel" in actual pixels
 uniform vec3 highlightRGB; // RGB float value of highlight color (max=1.0)
 
@@ -69,7 +69,7 @@ vec2 getCoord() {
 
 bool isHighlighted() {
 	vec2 myCoord = getCoord();
-	return myCoord.x == highlightCoord.x && myCoord.y == highlightCoord.y;
+	return myCoord.x == highlightCoords.x && myCoord.y == highlightCoords.y;
 }
 
 // We'll interpolate between these two colors as the extremes.

@@ -12,3 +12,6 @@ Idea: you can click on IPA glyphs and the map shows you where those phonemes are
 - [ ] actual clickable IPA chart
 - [ ] geolocation data for the languages in phoible
 - [ ] lat/lng mapping to coordinates on the map representation
+
+## Shader abstractions
+- [xemantic/shader-web-background alternatives](https://xemantic.github.io/shader-web-background/#alternatives)
