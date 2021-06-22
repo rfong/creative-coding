@@ -25,7 +25,7 @@ uniform vec2 iResolution;
 #define TAU 2.*PI
 
 // Highlighting vars. Note that GL's (0,0) is in the bottom left.
-uniform vec2 highlightCoords; // Coordinate to be highlighted
+uniform ivec2 highlightCoords; // Coordinate to be highlighted
 uniform vec2 coordDimensions; // x,y size of a "pixel" in actual pixels
 uniform vec3 highlightRGB; // RGB float value of highlight color (max=1.0)
 
@@ -60,15 +60,15 @@ float sphericalShadow(float v) {
 }
 
 // Get the coordinates of the current "pixel" unit we are inside.
-vec2 getCoord() {
-	return vec2(
+ivec2 getCoord() {
+	return ivec2(
 		floor(1.0 * gl_FragCoord.x / coordDimensions.x),
 		floor(1.0 * gl_FragCoord.y / coordDimensions.y)
 	);
 }
 
 bool isHighlighted() {
-	vec2 myCoord = getCoord();
+	ivec2 myCoord = getCoord();
 	return myCoord.x == highlightCoords.x && myCoord.y == highlightCoords.y;
 }
 
