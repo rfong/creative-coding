@@ -1,6 +1,14 @@
 document.addEventListener("DOMContentLoaded", function() {
 
   let asciiData = [];
+	const fetchShaderPromise = new Promise((resolve, reject) => {
+		$.get('langmap.frag', function(fragShader) {
+			resolve(fragShader);
+		});
+	});
+
+	fetchShaderPromise
+		.then((fragShader) => console.log("fetched:", fragShader));
 
   // Force canvas dimensions. It's spontaneously resizing in prod for reasons
   // I cannot fathom
@@ -28,35 +36,44 @@ document.addEventListener("DOMContentLoaded", function() {
       $('#skymap').append('<pre class="ascii-row">' + row + '</pre>');
     });
     $('#ascii-render').html("");
-    setupShader();
-  }
+		setupShader();
+	}
 
-  function setupShader() {
-    shaderWebBackground.shade({
-      shaders: {
-        bg: {
-          uniforms: {
-            // Canvas resolution
-            iResolution: (gl, loc, ctx) => gl.uniform2f(loc, ctx.width, ctx.height),
-            // Current time (millis)
-            iTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000),
-            // Dimensions of an ASCII "pixel"
-            coordDimensions: (gl, loc, ctx) => gl.uniform2f(loc,
-              ctx.width * 1.0 / asciiData[0].length,
-              ctx.height * 1.0 / asciiData.length
-            ),
-            // Which coords we want highlighted
-            highlightCoords: (gl, loc) => gl.uniform2iv(loc, [44, 56]),
-            /*highlightCoords: (gl, loc) => gl.uniform2iv(loc, _.flatten([
-              [44,56], [45,56], [46,56], [35,50],
-            ])),*/
-            // RGB value of the highlight color
-            highlightRGB: (gl, loc) => gl.uniform3f(loc, 1.0, 0.0, 0.0),
-          },
-        },
-      },
-      canvas: document.getElementById("skymap-canvas"),
-    });
+	function setupShader() {
+		$.get('langmap.frag', function(fragShader) {
+			var canvas = $('#skymap-canvas')[0];
+			// Set up GLSL and load the fragment shader
+			var sandbox = new GlslCanvas(canvas);
+			sandbox.load(fragShader);
+
+			// Set up uniforms.
+			// GLSL canvas type conversion doesn't support integers, so all ints will
+			// become floats in GLSL.
+
+			// uniform vec2 u_coordDimensions
+			//   dimensions of an ASCII "pixel"
+			sandbox.setUniform(
+				"u_coordDimensions",
+				canvas.width * 1.0 / asciiData[0].length,
+				canvas.height * 1.0 / asciiData.length,
+			);
+
+			// uniform vec3 u_highlightRGB
+			//   RGB value of a highlighted ASCII "pixel"
+			sandbox.setUniform("u_highlightRGB", 1.0, 0.0, 0.0);
+
+			// uniform vec2 u_highlightCoords (implicit ints)
+			//   ASCII coordinates to highlight.
+			var coords = [[44, 56], [40, 56], [33, 54]];
+			var args = ["u_highlightCoords"].concat(coords);
+			sandbox.setUniform.apply(sandbox, args);
+
+			// uniform float u_numHighlightCoordsRaw (implicit ints)
+			//   We cannot index into a non-constant length array in GLSL, so 
+			//   u_highlightCoords is intentionally overallocated. We pass the
+			//   contextual length so we'll know when to stop consuming coords.
+			sandbox.setUniform("u_numHighlightCoordsRaw", coords.length);
+		});
   }
 
 }); // end document ready
