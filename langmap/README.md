@@ -15,3 +15,15 @@ Idea: you can click on IPA glyphs and the map shows you where those phonemes are
 
 ## Shader abstractions
 - [xemantic/shader-web-background alternatives](https://xemantic.github.io/shader-web-background/#alternatives)
+
+## Setup
+```
+npm install
+```
+
+## Development
+```
+npm run start
+```
+
+

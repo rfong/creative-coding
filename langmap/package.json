@@ -1,0 +1,23 @@
+{
+  "name": "langmap",
+  "version": "1.0.0",
+  "description": "### What's this?",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "snowpack dev",
+    "init": "snowpack init",
+    "build": "snowpack build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "glslCanvas": "^0.1.7",
+    "require": "^2.4.20",
+    "snowpack": "^3.6.0"
+  }
+}
