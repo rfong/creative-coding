@@ -65,7 +65,7 @@ bool isHighlighted() {
   ivec2 myCoord = getCoord();
   for (int i=0; i<MAX_COORDS; i++) {
     // Need to break this way bc GLSL doesn't support non-const length loops
-    if (i > getNumCoords()) { break; }
+    if (i >= getNumCoords()) { break; }
     if (myCoord.x == int(u_highlightCoords[i].x) && myCoord.y == int(u_highlightCoords[i].y)) {
       return true;
     }
