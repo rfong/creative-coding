@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" href="index.css" />
+
+    <script type="text/javascript" src="./lib/lodash.min.js"></script>
+    <script type="text/javascript" src="./lib/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/aalib.js"></script>
+    <script type="text/javascript" src="./lib/shader-web-background.min.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script>
+
+    <script src="./index.js"></script>
+
+  </head>
+  <body>
+    <a href="../.."><< back</a>
+
+    <h1>[WIP] langmap: IPA geographic visualizer in GLSL</h1>
+
+    <!-- The aalib pipeline will render here. -->
+    <div id="ascii-render"></div>
+    <!-- Our data bound here. -->
+    <div id="skymap-wrapper"><div id="skymap">
+      <canvas id="skymap-canvas"
+              width="1101"
+              height="810"
+              ></canvas>
+
+      <!-- Rows to be appended here. -->
+    </div></div>
+
+    <p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
+    <p>Also referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to use a text layer as a mask for a layer beneath.</p>
+
+  </body>
+</html>

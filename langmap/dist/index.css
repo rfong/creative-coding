@@ -1,0 +1,32 @@
+#ascii-render {
+  display: none;
+}
+#skymap {
+  overflow: none;
+  width: auto;
+  color: #000;
+  background-color: #f00;
+  font-size: 9px;
+  /* Forces div to resize to contents */
+  display: inline-block;
+}
+#skymap pre.ascii-row {
+  color: #fff;
+  background: #000;
+  mix-blend-mode: multiply;
+  margin: 0;
+  line-height: 1em;
+  letter-spacing: 0.2em;
+
+  /* Temporarily hide this while debugging shader */
+  //opacity: 0;
+}
+#skymap-canvas {
+  position: absolute;
+  // Canvas appears to nondeterministically spontaneously resize itself
+  // in production? No idea why.
+  width: 1101px;
+  height: 810px;
+	max-width: 1101px;
+	max-height: 810px;
+}

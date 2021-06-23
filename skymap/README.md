@@ -1,5 +1,4 @@
 # skymap
-----
 
 This folder uses `npm` for packages and `snowpack` for ES6-compatible serving &
 bundling.
