@@ -1,3 +1,5 @@
+# Filter Glottolog lat/lng data down to just languages represented in Phoible.
+
 import json
 
 with open('common_glottocodes.txt', 'r') as f:

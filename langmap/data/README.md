@@ -2,7 +2,7 @@ Quick data transformation to get relevant geolocational language data by joining
 
 Note that you can also access Glottolog via the pip package [`pyglottolog`](https://github.com/glottolog/pyglottolog), which I didn't notice until later.
 
-# Extract lat/lng from Glottolog
+## Extract lat/lng from Glottolog
 
 The [Glottolog database](https://github.com/glottolog/glottolog/releases/) is structured as a filesystem tree.
 
@@ -16,7 +16,7 @@ grep -r "longitude =\|latitude =\|iso639-3 =\|level =" . | sort > glottolog_latl
 python3 glottolog.py
 ```
 
-# Filter down to languages represented in Phoible
+## Filter down to languages represented in Phoible
 
 The Phoible database is structured as a CSV file, where each row uniquely 
 represents a pairing of a phoneme and a dialect in which it appears.
@@ -44,3 +44,22 @@ comm -12 <(sort glottolog_glottocodes.txt) <(sort phoible_glottocodes.txt) > com
 python3 filter_glottos.py
 ```
 Output of this is `glottolog_latlng_filtered.json`.
+
+## Representational questions
+
+1. Does Phoible have a bijection between `'GlyphID'` and `'Phoneme'`?
+```
+> cat phoible.csv | cut -d',' -f6 | sort -u | wc -l
+  3145
+> cat phoible.csv | cut -d',' -f7 | sort -u | wc -l
+  3445
+```
+Unfortunately, no. It's not exactly clear to me why this difference exists, 
+but I'll use the `'Phoneme'` field as the unique representation.
+
+## Map phonemes to lat/lng
+
+```
+python3 map_phonemes.py
+```
+Output of this is `phoneme_latlng.json`.
