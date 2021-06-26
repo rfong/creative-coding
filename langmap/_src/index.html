@@ -17,9 +17,9 @@
   <body>
     <a href="../.."><< back</a>
 
-    <h1>[WIP] langmap: IPA geographic visualizer in GLSL</h1>
+    <h1>langmap: IPA geographic visualizer in GLSL</h1>
 
-    <p class="footnote">Note: This is <i>not</i> guaranteed to be a correct representation of the incorporated datasets yet, I need to double check the data processing. Entirely possible things are flipped or scaled incorrectly.</p>
+    <p class="footnote">Note: This is <i>not</i> guaranteed to be a correctly scaled representation of the incorporated datasets yet, I need to double check the data processing and map projection equations.</p>
 
     <!-- The aalib pipeline will render here. -->
     <div id="ascii-render"></div>
@@ -36,7 +36,7 @@
     </div>
 
     <p>Map projection: Mercator</p>
-    <p>Datasets used: <a href="https://phoible.github.io/">Phoible</a> and <a href="http://glottolog.org/">Glottolog</a></p>
+    <p>Datasets used: <a href="https://phoible.github.io/">Phoible</a> and <a href="http://glottolog.org/">Glottolog</a>. Note that this visualization does not accurately represent where phonemes are spoken. Since Glottolog is geared toward niche languages, I don't have geolocational data on a region to which a language may have traveled, only a single lat/long coordinate.</p>
     <p>The ASCII+shader map display builds off my previous drabble, <a href="/creative-coding/skymap">skymap</a>.</p>
 
   </body>
