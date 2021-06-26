@@ -63,3 +63,9 @@ but I'll use the `'Phoneme'` field as the unique representation.
 python3 map_phonemes.py
 ```
 Output of this is `phoneme_latlng.json`.
+
+## Compressed data representation for web use
+
+The above file is 3.87MB, which is a bit big. In addition, latitude and 
+longitude data is stored at an unnecessary degree of precision for the
+low-resolution map (that is, unless I want to implement zoom in the future).
