@@ -4,6 +4,7 @@
 # Longitude ranges from -180 to 180, with 0 at the Greenwich Meridian.
 # On the map, (0,0) is the bottom left corner. North and East go up.
 
+import itertools
 import json
 import math
 
@@ -42,7 +43,8 @@ with open('phoneme_latlng.json', 'r') as f:
 
 # Let's filter down to a more manageable set of phonemes.
 with open('phoneme_filter.json', 'r') as f:
-  phonemes = json.loads(f.read())
+  phonemes = json.loads(f.read())  # dictionary with categories as keys
+  all_phonemes = list(itertools.chain(*phonemes.values()))
 
 with open('phoneme_coords.json', 'w') as f:
   coord_data = {
@@ -54,7 +56,7 @@ with open('phoneme_coords.json', 'w') as f:
         )
         for lat,lng in v
     )) for k, v in data.items()
-    if k in phonemes
+    if k in all_phonemes
   }
   print("lng range: min=%f, max=%f" % (
     min(min([tup[0] for tup in v]) for v in coord_data.values() if v),
