@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Promise to fetch fragment shader text.
   const fetchShaderPromise = new Promise(
-		(resolve, reject) => $.get('langmap.frag', resolve));
+    (resolve, reject) => $.get('langmap.frag', resolve));
 
   // Set up the shader fragment.
   const glslPromise = fetchShaderPromise.then(
@@ -27,11 +27,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Promise to fetch phoneme->geo data.
   const geoDataPromise = new Promise((resolve, reject) =>
-	  $.get('phoneme_coords.json', function(data) {
-			data = _.map(data, function(cds, ph) {return {phoneme:ph, coords:cds} });
-			resolve(_.zipObject(_.range(data.length), data));
-		})
-	);
+    $.get('phoneme_coords.json', function(data) {
+      data = _.map(data, function(cds, ph) {return {phoneme:ph, coords:cds} });
+      resolve(_.zipObject(_.range(data.length), data));
+    })
+  );
   /*new Promise((resolve, reject) => {
     // dummy data
     resolve({
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
       setHighlightCoords([]);
     } else {
       geoDataPromise.then(
-				(data) => setHighlightCoords(data[phonemeId].coords));
+        (data) => setHighlightCoords(data[phonemeId].coords));
     }
   }
 

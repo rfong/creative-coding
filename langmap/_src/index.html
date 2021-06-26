@@ -19,6 +19,8 @@
 
     <h1>[WIP] langmap: IPA geographic visualizer in GLSL</h1>
 
+    <p>This is <i>not</i> guaranteed to be a correct representation of the incorporated datasets yet, I need to double check the data processing.</p>
+
     <!-- The aalib pipeline will render here. -->
     <div id="ascii-render"></div>
     <!-- Our data bound here. -->
@@ -28,11 +30,14 @@
       <!-- Rows to be appended here. -->
     </div></div>
 
+    <p>Click buttons to locate the origin places of languages that use these phonemes.</p>
     <div id="controls">
       <!-- Buttons to be inserted dynamically here -->
     </div>
 
+    <p>Map projection: Mercator</p>
     <p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
+    <p>Datasets used: <a href="https://phoible.github.io/">Phoible</a> and <a href="http://glottolog.org/">Glottolog</a></p>
     <p>Also referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to use a text layer as a mask for a layer beneath.</p>
 
   </body>
