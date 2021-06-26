@@ -85,7 +85,7 @@ void main() {
   }
   // Otherwise, run the oscillating animation
   gl_FragColor = vec4(
-    interpolateOsc(unitX(), color1, color2) * cylindricalShadow(unitY()),
+    interpolateOsc(unitX(), color1, color2),// * cylindricalShadow(unitY()),
     1.
   );
 }

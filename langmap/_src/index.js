@@ -3,7 +3,7 @@ var langmap = {};  // namespace
 document.addEventListener("DOMContentLoaded", function() {
 
   //const MAP_URL='mercator.ascii', MAP_URL_IS_IMAGE=false, CANVAS_WIDTH=1101, CANVAS_HEIGHT=810, ASCII_WIDTH=153, ASCII_HEIGHT=90;
-  const MAP_URL='mercator_wrap.ascii', MAP_URL_IS_IMAGE=false, CANVAS_WIDTH=864, CANVAS_HEIGHT=810, ASCII_WIDTH=120, ASCII_HEIGHT=90;
+  const MAP_URL='mercator_wrap.ascii', MAP_URL_IS_IMAGE=false, CANVAS_WIDTH=864, CANVAS_HEIGHT=540, ASCII_WIDTH=120, ASCII_HEIGHT=60;
 
   // Force canvas dimensions. This should probably be calculated dynamically
   // but I'm doing it manually out of laziness.
@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
     (fragShader) => setupShader(fragShader));
     // chained promise returns GlslCanvas instance
 
+  // Promise to fetch phoneme->geo data.
   const geoDataPromise = new Promise((resolve, reject) => {
     // dummy data
     resolve({
