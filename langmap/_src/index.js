@@ -17,11 +17,8 @@ document.addEventListener("DOMContentLoaded", function() {
   var glslCanvas;
 
   // Promise to fetch fragment shader text.
-  const fetchShaderPromise = new Promise((resolve, reject) => {
-    $.get('langmap.frag', function(fragShader) {
-      resolve(fragShader);
-    });
-  });
+  const fetchShaderPromise = new Promise(
+		(resolve, reject) => $.get('langmap.frag', resolve));
 
   // Set up the shader fragment.
   const glslPromise = fetchShaderPromise.then(
@@ -29,13 +26,19 @@ document.addEventListener("DOMContentLoaded", function() {
     // chained promise returns GlslCanvas instance
 
   // Promise to fetch phoneme->geo data.
-  const geoDataPromise = new Promise((resolve, reject) => {
+  const geoDataPromise = new Promise((resolve, reject) =>
+	  $.get('phoneme_coords.json', function(data) {
+			data = _.map(data, function(cds, ph) {return {phoneme:ph, coords:cds} });
+			resolve(_.zipObject(_.range(data.length), data));
+		})
+	);
+  /*new Promise((resolve, reject) => {
     // dummy data
     resolve({
       0: {phoneme: "a", coords: [[44, 56], [40, 56], [33, 54]]},
       1: {phoneme: "b", coords: [[74, 56], [70, 56], [73, 54]]},
     });
-  });
+  });*/
 
   // Set up clickable controls
   geoDataPromise.then(function(data) {
@@ -145,7 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
       setHighlightCoords([]);
     } else {
       geoDataPromise.then(
-        (data) => setHighlightCoords(data[phonemeId].coords));
+				(data) => setHighlightCoords(data[phonemeId].coords));
     }
   }
 

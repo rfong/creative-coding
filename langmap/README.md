@@ -1,16 +1,22 @@
-# langmap
-Idea: you can click on IPA glyphs and the map shows you where those phonemes are commonly spoken in the world.
+# langmap (WIP)
+The idea is that you can click on IPA glyphs and the map shows you where those phonemes are commonly spoken in the world.
 
-Current state: An ASCII world map combined with a shader that allows ASCII "coordinates" to be highlighted. Uses [`patriciogonzalezvivo/glslCanvas`](https://github.com/patriciogonzalezvivo/glslCanvas/).
+Work in progress, need to double check the map projection math and also figure 
+out a better way to display more phonemes.
 
 ### Task breakdown
+**Mechanics with dummy data**
 - [x] get the shader to change color at a specified ASCII "pixel"
 - [x] change color at a collection of specified ASCII "pixels"
 - [x] hardcoded button as test to change coordinates on map
 
+**Geolocation<>phoneme data**
+- [x] geolocation data for the languages in phoible
+- [x] lat/lng mapping to coordinates on the map representation
+- [x] click phoneme buttons to display calculated coordinates
+
+**Interface improvements**
 - [ ] actual clickable IPA chart
-- [ ] geolocation data for the languages in phoible
-- [ ] lat/lng mapping to coordinates on the map representation
 
 ## Build notes
 This folder uses `npm` for packages and `snowpack` for ES6-compatible serving &

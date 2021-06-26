@@ -14,7 +14,7 @@ uniform vec2 u_mouse;
 // Note that GL's (0,0) is in the bottom left.
 uniform vec2 u_coordDimensions; // x,y size of a "pixel" in actual pixels
 uniform vec3 u_highlightRGB; // RGB float value of highlight color (max=1.0)
-#define MAX_COORDS 10
+#define MAX_COORDS 200
 uniform vec2 u_highlightCoords[MAX_COORDS]; // Coordinate to be highlighted (implicit int)
 uniform float u_numHighlightCoordsRaw; // Number of coords being passed (implicit int)
 
