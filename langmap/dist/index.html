@@ -3,16 +3,15 @@
   <head>
     <meta charset="utf-8" />
 
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../../style.css">
     <link rel="stylesheet" href="index.css" />
 
     <script type="text/javascript" src="./lib/lodash.min.js"></script>
     <script type="text/javascript" src="./lib/jquery.min.js"></script>
     <script type="text/javascript" src="./lib/aalib.js"></script>
-    <script type="text/javascript" src="./lib/shader-web-background.min.js"></script>
-    <script type="text/javascript" src="https://rawgit.com/patriciogonzalezvivo/glslCanvas/master/dist/GlslCanvas.js"></script>
+    <script type="text/javascript" src="./lib/GlslCanvas.js"></script>
 
-    <script src="./index.js"></script>
+    <script type="module" src="./index.js"></script>
 
   </head>
   <body>
@@ -20,19 +19,25 @@
 
     <h1>[WIP] langmap: IPA geographic visualizer in GLSL</h1>
 
+    <p>This is <i>not</i> guaranteed to be a correct representation of the incorporated datasets yet, I need to double check the data processing.</p>
+
     <!-- The aalib pipeline will render here. -->
     <div id="ascii-render"></div>
     <!-- Our data bound here. -->
     <div id="skymap-wrapper"><div id="skymap">
-      <canvas id="skymap-canvas"
-              width="1101"
-              height="810"
-              ></canvas>
+      <canvas id="skymap-canvas"></canvas>
 
       <!-- Rows to be appended here. -->
     </div></div>
 
+    <p>Click buttons to locate the origin places of languages that use these phonemes.</p>
+    <div id="controls">
+      <!-- Buttons to be inserted dynamically here -->
+    </div>
+
+    <p>Map projection: Mercator</p>
     <p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
+    <p>Datasets used: <a href="https://phoible.github.io/">Phoible</a> and <a href="http://glottolog.org/">Glottolog</a></p>
     <p>Also referenced <a href="https://css-tricks.com/css-techniques-and-effects-for-knockout-text/">this helpful guide</a> on CSS mix-blend-mode to use a text layer as a mask for a layer beneath.</p>
 
   </body>

@@ -14,7 +14,7 @@ uniform vec2 u_mouse;
 // Note that GL's (0,0) is in the bottom left.
 uniform vec2 u_coordDimensions; // x,y size of a "pixel" in actual pixels
 uniform vec3 u_highlightRGB; // RGB float value of highlight color (max=1.0)
-#define MAX_COORDS 10
+#define MAX_COORDS 200
 uniform vec2 u_highlightCoords[MAX_COORDS]; // Coordinate to be highlighted (implicit int)
 uniform float u_numHighlightCoordsRaw; // Number of coords being passed (implicit int)
 
@@ -65,7 +65,7 @@ bool isHighlighted() {
   ivec2 myCoord = getCoord();
   for (int i=0; i<MAX_COORDS; i++) {
     // Need to break this way bc GLSL doesn't support non-const length loops
-    if (i > getNumCoords()) { break; }
+    if (i >= getNumCoords()) { break; }
     if (myCoord.x == int(u_highlightCoords[i].x) && myCoord.y == int(u_highlightCoords[i].y)) {
       return true;
     }
@@ -85,7 +85,7 @@ void main() {
   }
   // Otherwise, run the oscillating animation
   gl_FragColor = vec4(
-    interpolateOsc(unitX(), color1, color2) * cylindricalShadow(unitY()),
+    interpolateOsc(unitX(), color1, color2),// * cylindricalShadow(unitY()),
     1.
   );
 }
