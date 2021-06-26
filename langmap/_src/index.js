@@ -2,10 +2,12 @@ var langmap = {};  // namespace
 
 document.addEventListener("DOMContentLoaded", function() {
 
+	const MAP_URL='mercator.ascii', MAP_URL_IS_IMAGE=false, CANVAS_WIDTH=1101, CANVAS_HEIGHT=810, ASCII_WIDTH=153, ASCII_HEIGHT=90;
+
   // Force canvas dimensions. It's spontaneously resizing in prod for reasons
   // I cannot fathom
-  $('#skymap-canvas').width = 1101;
-  $('#skymap-canvas').height = 810;
+  $('#skymap-canvas').width = CANVAS_WIDTH;
+  $('#skymap-canvas').height = CANVAS_HEIGHT;
   var glslCanvas;
 
   // Promise to fetch fragment shader text.
@@ -21,13 +23,41 @@ document.addEventListener("DOMContentLoaded", function() {
     // chained promise returns GlslCanvas instance
 
   // Promise to fetch ASCII representation of map.
-  const fetchAsciiPromise = new Promise((resolve, reject) => {
-    $.get('mercator.ascii', function(ascii) {
-      var data = ascii.trim().split('\n');
-      setupAscii(data);
-      return data; // chained promise returns ascii data
+  //const asciiPromise = getAsciiPromise('mercator.ascii');
+  const asciiPromise = getAsciiPromise('mercator.png', true);
+  asciiPromise.then(setupAscii);
+
+	// Return a promise to provide the ASCII data representation of the map.
+  // `url` can point to an image to be transformed to ASCII, or to a cached
+  // ASCII representation of an image.
+	function getAsciiPromise(url, isImage) {
+    // If provided with an image, regenerate the ASCII data using aalib.
+		if (isImage === true) {
+			return new Promise((resolve, reject) => {
+  			// `aalib` doesn't have a prebuilt way to render the ASCII it generates 
+        // to an in-memory string, so we're going to render it invisibly, 
+  			// extract the HTML, then operate upon it as data.
+        let img = aalib.read.image.fromURL(url)
+          .map(aalib.aa({width: 153, height: 90}))  // Dimensions in chars
+          .map(aalib.filter.inverse())
+        img.map(aalib.render.html({
+          el: document.getElementById("ascii-render"),
+          color: '#fff',
+          charset: aalib.charset.SIMPLE_CHARSET,
+        }))
+        .subscribe(() => resolve(
+					// extract the data from the aalib render div and run resolve fn
+					$('#ascii-render').html().split('\n')
+				));
+			});
+		}
+		// Otherwise, assume the file at `url` contains ASCII data to display
+		return new Promise((resolve, reject) => {
+			$.get(url, function(ascii) {
+				resolve(ascii.trim().split('\n'));
+			});
     });
-  });
+	}
 
   // Display ASCII and set up dependent GLSL uniforms
   function setupAscii(asciiData) {
