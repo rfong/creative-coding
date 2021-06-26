@@ -40,7 +40,7 @@ Leftmost tip of the current map is the western tip of Alaska, let's say Wales,
 with longitude=`-168.1098805`.
 
 ```
-python preprocess.py
+python3 preprocess.py
 ```
 
 ### Compression stats
@@ -55,6 +55,6 @@ With the full dataset, we have thousands of phonemes loaded on the page, which
 is an information overload for anyone who isn't a linguist.
 
 To increase interface legibility, let's just filter the dataset down to the 75 
-pulmonic consonants in [Wikipedia's IPA table](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet) for now.
+pulmonic consonants and 27 vowels in [Wikipedia's IPA table](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet) for now, with the acknowledgement that this is Euro-centric.
 
 The set of phonemes upon which to filter the final dataset is stored in `phoneme_filter.json`.
