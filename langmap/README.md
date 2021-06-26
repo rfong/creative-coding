@@ -33,5 +33,9 @@ consolidating the build processes for simplicity.
 - IPA <> language data: [Phoible](https://phoible.github.io/)
 - language <> location data: [Glottolog 4.4](https://github.com/glottolog/glottolog/releases/tag/v4.4)
 
+See [data/README.md](data/README.md) for the initial data extraction & munging 
+work from the raw datasets, and [PREPROCESSING.md](PREPROCESSING.md) for the 
+final data transformation and preprocessing to make it more performant.
+
 ## Shader abstractions
 I [drafted the shader](https://rfong.github.io/creative-coding/skymap) using [xemantic/shader-web-background](https://xemantic.github.io/shader-web-background/) as a GLSL abstraction, but experienced difficulties type-converting uniform arrays-of-vectors, and switched to [`glslCanvas`](https://github.com/patriciogonzalezvivo/glslCanvas/) as a result.

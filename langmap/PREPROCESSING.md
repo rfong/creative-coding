@@ -1,3 +1,5 @@
+See [data/README.md](data/README.md) for prior work.
+
 ## Preprocessing logic
 
 `langmap/data/phoneme_latlng.json` contains the relevant results from the 
@@ -24,7 +26,7 @@ of areas that are far from the equator, and therefore reduces the perceived
 importance/size of countries closer to the equator. 
 See [this animated visualization](https://en.wikipedia.org/wiki/Mercator_projection#/media/File:Worlds_animate.gif).
 
-## TODO: Generate a compressed data representation for web use
+## Generate a compressed data representation for web use
 
 We now need a script that takes in the phoneme-to-latlng file, the map 
 granularity, and the leftmost longitude in the map image, and outputs a 
@@ -36,6 +38,10 @@ dimensions change.
 
 Leftmost tip of the current map is the western tip of Alaska, let's say Wales,
 with longitude=`-168.1098805`.
+
+```
+python preprocess.py
+```
 
 ### Compression stats
 
@@ -51,3 +57,4 @@ is an information overload for anyone who isn't a linguist.
 To increase interface legibility, let's just filter the dataset down to the 75 
 pulmonic consonants in [Wikipedia's IPA table](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet) for now.
 
+The set of phonemes upon which to filter the final dataset is stored in `phoneme_filter.json`.
