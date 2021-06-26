@@ -41,10 +41,14 @@ document.addEventListener("DOMContentLoaded", function() {
   geoDataPromise.then(function(data) {
     _.each(data, function(x, id) {
       $('#controls').append(
-        '<button data-id="' + id + '" ' +
-        'onclick="langmap.showPhoneme(' + id + ')">' + 
-        x.phoneme + '</button>'
-      );
+        '<button data-id="' + id + '">' + x.phoneme + '</button>');
+      $('#controls button[data-id='+id+']').click(function() {
+        // toggle CSS classes
+        $('#controls button').removeClass('selected');
+        $(this).addClass('selected');
+        // update shader
+        langmap.showPhoneme(id);
+      });
     })
   });
 

@@ -24,3 +24,7 @@
 #skymap-canvas {
   position: absolute;
 }
+
+#controls button.selected {
+  color: #cc0000;
+}

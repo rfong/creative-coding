@@ -11,7 +11,7 @@
     <script type="text/javascript" src="./lib/aalib.js"></script>
     <script type="text/javascript" src="./lib/GlslCanvas.js"></script>
 
-    <script src="./index.js"></script>
+    <script type="module" src="./index.js"></script>
 
   </head>
   <body>
@@ -29,8 +29,7 @@
     </div></div>
 
     <div id="controls">
-      <button data-id="clear" onclick="langmap.showPhoneme(null)">clear</button>
-			<!-- More buttons to be inserted dynamically below -->
+      <!-- Buttons to be inserted dynamically here -->
     </div>
 
     <p>Tools used: <a href="http://mir3z.github.io/aalib.js/">aalib.js</a> for image->ASCII conversion, <a href="https://github.com/xemantic/shader-web-background">xemantic/shader-web-background</a> for GLSL fragment shading</p>
