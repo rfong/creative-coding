@@ -35,7 +35,7 @@ def lng_to_coords(lng):
 def lat_to_coords(lat):
   lat = crop_lat(to_radians(lat))
   #prj = math.log(math.tan(math.pi / 4 + lat / 2)) 
-  return (lat + MAX_LATITUDE) / (MAX_LATITUDE-MIN_LATITUDE) * MAP_HEIGHT
+  return (1 - (lat + MAX_LATITUDE) / (MAX_LATITUDE-MIN_LATITUDE)) * MAP_HEIGHT
 
 with open('phoneme_latlng.json', 'r') as f:
   data = json.loads(f.read())
