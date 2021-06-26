@@ -28,6 +28,25 @@ document.addEventListener("DOMContentLoaded", function() {
     (fragShader) => setupShader(fragShader));
     // chained promise returns GlslCanvas instance
 
+  const geoDataPromise = new Promise((resolve, reject) => {
+    // dummy data
+    resolve({
+      0: {phoneme: "a", coords: [[44, 56], [40, 56], [33, 54]]},
+      1: {phoneme: "b", coords: [[74, 56], [70, 56], [73, 54]]},
+    });
+  });
+
+  // Set up clickable controls
+  geoDataPromise.then(function(data) {
+    _.each(data, function(x, id) {
+      $('#controls').append(
+        '<button data-id="' + id + '" ' +
+        'onclick="langmap.showPhoneme(' + id + ')">' + 
+        x.phoneme + '</button>'
+      );
+    })
+  });
+
   // Promise to fetch ASCII representation of map.
   const asciiPromise = getAsciiPromise(MAP_URL, MAP_URL_IS_IMAGE);
   asciiPromise.then(setupAscii);
@@ -98,9 +117,6 @@ document.addEventListener("DOMContentLoaded", function() {
     //   RGB value of a highlighted ASCII "pixel"
     glslCanvas.setUniform("u_highlightRGB", 1.0, 0.0, 0.0);
 
-    // Set currently highlighted coordinates.    
-    setHighlightCoords([[44, 56], [40, 56], [33, 54]], glslCanvas);
-
     return glslCanvas;
   }
 
@@ -120,10 +136,11 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   langmap.showPhoneme = function(phonemeId) {
-    if (phonemeId==1) {
-      setHighlightCoords([[44, 56], [40, 56], [33, 54]]);
+    if (phonemeId == null) {
+      setHighlightCoords([]);
     } else {
-      setHighlightCoords([[74, 56], [70, 56], [73, 54]]);
+      geoDataPromise.then(
+        (data) => setHighlightCoords(data[phonemeId].coords));
     }
   }
 
