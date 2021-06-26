@@ -59,13 +59,16 @@ but I'll use the `'Phoneme'` field as the unique representation.
 
 ## Map phonemes to lat/lng
 
+Join the Phoible and Glottolog outputs to create a mapping from phonemes to 
+latitude/longitude coordinates.
 ```
 python3 map_phonemes.py
 ```
 Output of this is `phoneme_latlng.json`.
 
-## Compressed data representation for web use
+## Further data preprocessing
 
-The above file is 3.87MB, which is a bit big. In addition, latitude and 
-longitude data is stored at an unnecessary degree of precision for the
-low-resolution map (that is, unless I want to implement zoom in the future).
+The above file is 3.87MB, which is large for web use. In `langmap/_src`, I 
+will do further preprocessing & compression that leverages the difference 
+between the high-resolution lat/lng space and our low-resolution map 
+representation.
