@@ -2,6 +2,7 @@ html, body {
   position: relative;
   margin: 0;
   padding: 20px;
+	max-width: 900px;
 
   font-family: 'Courier New', monospace;
 }

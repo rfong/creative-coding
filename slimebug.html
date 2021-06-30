@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.3.1/p5.js"></script>-->
+    <script src="lib/p5-1.3.1.js"></script>
+
+    <script src="slimebug.js"></script>
+
+  </head>
+  <body>
+
+		<a href="index.html"><< back</a>
+
+    <h1>procedural slime bugs</h1>
+    <p>(the bugs don't know about bounding boxes, so you'll have to refresh when they wander off the canvas 😂)</p>
+    <p>Interesting / funny observations about this sketch:</p>
+    <ul>
+      <li>To simplify the math, the bugs are drawn within a translated relative frame of reference. However, the slime trails need to be drawn in absolute coordinates.</li>
+      <li>A legitimate use case for "absolute butt coordinates"</li>
+      <li>The slime trails are attenuated without factoring in a time variable by using a stack of slime sizes that is decremented proportionally to the slime trail index.</li>
+    </ul>
+
+    <div id="canvas"></div>
+    <p class="footnote">created 2021-06-30 in 1.5hrs during RC creative coding meetup</p>
+
+  </body>
+</html>
