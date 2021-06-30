@@ -19,7 +19,10 @@
 
     <h1>langmap: IPA geographic visualizer in GLSL</h1>
 
-    <p class="footnote">Note: This is <i>not</i> guaranteed to be a correctly scaled representation of the incorporated datasets yet, I need to double check the data processing and map projection equations.</p>
+    <p>Click buttons to locate the origin places of languages that use these phonemes.</p>
+    <p id="controls">
+      <!-- Buttons to be inserted dynamically here -->
+    </div>
 
     <!-- The aalib pipeline will render here. -->
     <div id="ascii-render"></div>
@@ -30,10 +33,7 @@
       <!-- Rows to be appended here. -->
     </div></div>
 
-    <p>Click buttons to locate the origin places of languages that use these phonemes.</p>
-    <div id="controls">
-      <!-- Buttons to be inserted dynamically here -->
-    </div>
+    <p class="footnote">Caveat: This is <i>not</i> guaranteed to be a correctly scaled representation of the incorporated datasets yet, I need to double check the data processing and map projection equations.</p>
 
     <p>Map projection: Mercator</p>
     <p>Datasets used: <a href="https://phoible.github.io/">Phoible</a> and <a href="http://glottolog.org/">Glottolog</a>. Note that this visualization does not accurately represent where phonemes are spoken. Since Glottolog is geared toward niche languages, I don't have geolocational data on a region to which a language may have traveled, only a single lat/long coordinate.</p>
