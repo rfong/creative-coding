@@ -1,7 +1,10 @@
 // draw a bug that's basically a turtle but with an absolute-coord slime trail
 
+const CANVAS_WIDTH = 600,
+      CANVAS_HEIGHT = 600;
+
 setup = () => {
-  var canvas = createCanvas(600, 600);
+  var canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
   canvas.parent('canvas');
 }
 
@@ -56,13 +59,28 @@ function Bug(x, y, d, dir) {
   
   // Make random changes before draw turn
   this.update = () => {
-    this.x += this.speed * cos(this.dir);
-    this.y += this.speed * sin(this.dir);
-    if (prob(0.02)) {
+    // Walk forward in current direction
+    this.move(this.speed * cos(this.dir), this.speed * sin(this.dir));
+
+    // Occasionally change direction of rotation, don't be too jittery
+    if (prob(0.01)) {
       console.log("change direction", this.rotationCCW ? "CCW" : "CW");
       this.rotationCCW = !this.rotationCCW;
     }
+    // Increment angle randomly
     this.dir += random(0.02) * (this.rotationCCW ? -1 : 1);
+  }
+
+  // Move the bug incrementally. Do not allow bug to exit the canvas; only
+  // increment if in bounds.
+  this.move = function(x, y) {
+    var r = this.r + 10;
+    if (this.x + x >= r && this.x + x < CANVAS_WIDTH - r) {
+      this.x += x;
+    }
+    if (this.y + y >= r && this.y + y < CANVAS_HEIGHT - r) {
+      this.y += y;
+    }
   }
   
   // Draw bug on canvas
@@ -144,5 +162,5 @@ function Bug(x, y, d, dir) {
       this.y + this.r * sin(theta + this.dir),
     ];
   }
-  
+
 }
