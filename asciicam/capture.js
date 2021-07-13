@@ -1,3 +1,4 @@
+// video manipulation code borrowed from:
 // https://github.com/mdn/samples-server/blob/master/s/webrtc-capturestill/capture.js
 
 (function() {
