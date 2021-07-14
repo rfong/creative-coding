@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="../style.css">
+
+    <script type="text/javascript" src="./lib/lodash.min.js"></script>
+
+    <script src="./capture.js"></script>
+
+  	<style>
+  	  .hidden { display: none; }
+  	</style>
+
+  </head>
+  <body>
+    <a href="../"><< back</a>
+
+    <h1>ghost lines</h1>
+
+  	<p>Today's prompts: use lines wisely (I used them unwisely), self-portrait, look deep into the void. What I did:</p>
+  	<ul>
+  	  <li>sampled a webcam stream in greyscale</li>
+  	  <li>found the frame's center of "mass" (where black=hi, white=lo)</li>
+  	  <li>randomly sampled a subset of the points that changed values between sample frames by over a nontrivial threshold</li>
+  	  <li>drew vectors of the change in overall frame center of mass from those points</li>
+  	</ul>
+  	<p>Draft is shamefully nonperformant, and this method of choosing lines doesn't always line up with intuition, but I had fun.</p>
+
+    <div class="camera">
+      <video id="video" class="hidden">Video stream not available.</video>
+    </div>
+    <canvas id="video-mirror"></canvas>
+
+  	<p class="footnote">drafted 2021-07-14 during RC creative coding meetup</p>
+
+  	<!-- for GLSL canvas -->
+  	<canvas id="canvas"></canvas>
+
+  </body>
+</html>
