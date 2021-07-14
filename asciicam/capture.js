@@ -28,8 +28,10 @@
     photo = document.getElementById('photo');
     startbutton = document.getElementById('startbutton');
 
-    navigator.mediaDevices.getUserMedia({video: true, audio: false})
+    // TODO: cross-browser support?
+  	navigator.mediaDevices.getUserMedia({video: true, audio: false})
     .then(function(stream) {
+  	  console.log("stream:", stream);
       video.srcObject = stream;
       video.play();
     })
@@ -93,12 +95,19 @@
       //im = contrastImage(im, 100);
       //im = brightenImage(im, 30);
       //im = thresholdImage(im, 0.3);
-      context.putImageData(im, 0, 0);
+      //context.putImageData(im, 0, 0);
     
-      var dataURI = canvas.toDataURL('image/png');
-      photo.setAttribute('src', dataURI);
+      //var dataURI = canvas.toDataURL('image/png');
+      //photo.setAttribute('src', dataURI);
 
-      imgToAscii()
+      // Read image from source & kick off async ascii conversion pipeline
+      toAscii(aalib.read.imageData.fromImageData(im), null);
+
+  		/*imgToAscii((data) => {
+  		  console.log(data);
+        $('#ascii-render').html(data.split('\n').join('<br>'));
+  		});*/
+  		//imgToAscii(console.log);
     } else {
       clearphoto();
     }
@@ -149,18 +158,21 @@
 
   /* end deprecated -- manual image manipulation */
 
-  function imgToAscii() {
-    //let img = aalib.read.video.fromVideoElement(document.getElementById("video"));
-    // can't figure out how to make video reader work
-    let img = aalib.read.image.fromHTMLImage(document.getElementById("photo"));
-    img.map(aalib.aa({width: 300, height: 180}))
+  function toAscii(aaImg, handlerFn) {
+  	// Instantiate AA wrapper
+    aaImg.map(aalib.aa({width: 300, height: 180}))
+  	// Filter
     .map(aalib.filter.contrast(1.5))
     .map(aalib.filter.brightness(15))
+  	// Render
     .map(aalib.render.html({
       el: document.getElementById("ascii-render"),
+  		//renderToString: true,
       color: '#000',
       charset: aalib.charset.SIMPLE_CHARSET,
-    })).subscribe();
+    }))
+  	// Execute/observe
+  	.subscribe(handlerFn);
   }
 
   // Set up our event listener to run the startup process
