@@ -1,4 +1,4 @@
-// video manipulation code borrowed from:
+// video manipulation code partially borrowed from:
 // https://github.com/mdn/samples-server/blob/master/s/webrtc-capturestill/capture.js
 
 (function() {
@@ -31,7 +31,6 @@
     // TODO: cross-browser support?
   	navigator.mediaDevices.getUserMedia({video: true, audio: false})
     .then(function(stream) {
-  	  console.log("stream:", stream);
       video.srcObject = stream;
       video.play();
     })
@@ -60,7 +59,6 @@
 
     setInterval(function(ev) {
       takepicture();
-      //ev.preventDefault();
     }, 100);
 
     clearphoto();
@@ -73,9 +71,6 @@
     var context = canvas.getContext('2d');
     context.fillStyle = "#AAA";
     context.fillRect(0, 0, canvas.width, canvas.height);
-
-    var data = canvas.toDataURL('image/png');
-    photo.setAttribute('src', data);
   }
   
   // Capture a photo by fetching the current contents of the video
@@ -91,72 +86,13 @@
       canvas.height = height;
       context.drawImage(video, 0, 0, width, height);
 
-      var im = context.getImageData(0, 0, width, height);
-      //im = contrastImage(im, 100);
-      //im = brightenImage(im, 30);
-      //im = thresholdImage(im, 0.3);
-      //context.putImageData(im, 0, 0);
-    
-      //var dataURI = canvas.toDataURL('image/png');
-      //photo.setAttribute('src', dataURI);
-
       // Read image from source & kick off async ascii conversion pipeline
+      var im = context.getImageData(0, 0, width, height);
       toAscii(aalib.read.imageData.fromImageData(im), null);
-
-  		/*imgToAscii((data) => {
-  		  console.log(data);
-        $('#ascii-render').html(data.split('\n').join('<br>'));
-  		});*/
-  		//imgToAscii(console.log);
     } else {
       clearphoto();
     }
   }
-
-  /* deprecated -- manual image manipulation */
-
-  function thresholdImage(im, thresh) {  // input vals [0.0...1.0]
-    var d = im.data;
-    for(var i=0;i<d.length;i+=4){   //r,g,b,a
-      // set high if pixel is over threshold; else set low.
-      var val = (rgbToVal(d.slice(i, i+3)) > thresh) ? 255 : 0;
-      // set RGB values
-      _.each(_.range(i, i+3), (ind) => d[ind] = val);
-    }
-    return im;
-  }
-
-  function rgbToVal(rgbArr) {
-    return _.max(_.map(rgbArr, (x) => x/255.0));
-  }
-
-  function euclideanDist(mySlice) {
-    return Math.sqrt(_.sum(_.map(mySlice, (x) => x*x)));
-  }
-
-  function brightenImage(im, brighten) {
-    var d = im.data;
-    for(var i=0;i<d.length;i+=4){   //r,g,b,a
-      d[i] = d[i] + brighten;
-      d[i+1] = d[i+1] + brighten;
-      d[i+2] = d[i+2] + brighten;
-    }
-    return im;
-  }
-
-  function contrastImage(im, contrast){  //input range [-100..100]
-    var d = im.data;
-    contrast = (contrast/100) + 1;  //convert to decimal & shift range: [0..2]
-    var intercept = 128 * (1 - contrast);
-    for(var i=0;i<d.length;i+=4){   //r,g,b,a
-      d[i] = d[i]*contrast + intercept;
-      d[i+1] = d[i+1]*contrast + intercept;
-      d[i+2] = d[i+2]*contrast + intercept;
-    }
-    return im;
-  }
-
-  /* end deprecated -- manual image manipulation */
 
   function toAscii(aaImg, handlerFn) {
   	// Instantiate AA wrapper
@@ -167,7 +103,6 @@
   	// Render
     .map(aalib.render.html({
       el: document.getElementById("ascii-render"),
-  		//renderToString: true,
       color: '#000',
       charset: aalib.charset.SIMPLE_CHARSET,
     }))
