@@ -89,44 +89,48 @@
 
       // calculate centroid
       centroid = im.getCenterOfMass();
-  		/*
-  		// draw centroid
-  		ctx.beginPath();
-  		ctx.arc(centroid[0], centroid[1], 5, 0, 2*Math.PI);
-  		ctx.fillStyle = "red";
-  		ctx.fill();
-  		*/
+     
+      // draw centroid
+      //drawCentroidMotion(ctx, centroid, priorCenter);
 
-  		// draw line from past centroid
-  		if (priorCenter) {
-  		  drawLine(ctx, centroid, priorCenter, "red");
-  			var dx = centroid[0] - priorCenter[0];
-  			var dy = centroid[1] - priorCenter[1];
-  		}
+      var dx = priorCenter ? centroid[0] - priorCenter[0] : undefined,
+          dy = priorCenter ? centroid[1] - priorCenter[1] : undefined;
 
+      // Draw many lines
       if (priorFrame) {
-  		  diff = im.getDiffCoords(priorFrame, 0.4, 0.01);
-  			console.log(diff.length, "coords changed");
-  			_.each(diff, (coord) => {
-  			  drawLine(ctx, coord, [coord[0]+dx, coord[1]+dy], "red");
-  			});
-  		}
+        diff = im.getDiffCoords(priorFrame, 0.4, 0.01);
+        console.log(diff.length, "sample coords");
+        _.each(diff, (coord) => {
+          drawLine(ctx, coord, [coord[0]+dx, coord[1]+dy], "red");
+        });
+      }
 
-  		// save for next run
-  		priorCenter = centroid;
-  		priorFrame = im;
+      // save for next run
+      priorCenter = centroid;
+      priorFrame = im;
 
     } else {
       clearphoto();
     }
   }
 
+  function drawCentroidMotion(ctx, centroid, priorCenter) {
+    ctx.beginPath();
+    ctx.arc(centroid[0], centroid[1], 5, 0, 2*Math.PI);
+    ctx.fillStyle = "red";
+    ctx.fill();
+
+    if (priorCenter) {
+      drawLine(ctx, centroid, priorCenter, "red");
+    }
+  }
+
   function drawLine(ctx, xy1, xy2, style) {
     ctx.beginPath();
-  	ctx.moveTo(xy1[0], xy1[1]);
-  	ctx.lineTo(xy2[0], xy2[1]);
-  	ctx.strokeStyle = style;
-  	ctx.stroke();
+    ctx.moveTo(xy1[0], xy1[1]);
+    ctx.lineTo(xy2[0], xy2[1]);
+    ctx.strokeStyle = style;
+    ctx.stroke();
   }
 
   // IMAGE RAWDATA MANIPULATION FUNCTIONS
@@ -134,64 +138,64 @@
   // https://stackoverflow.com/a/43053803
   const cartesian = (a, b) => [].concat(
     ...a.map(
-  	  d => b.map(
-  		  e => [].concat(d, e)
-  		)
-  	));
+      d => b.map(
+        e => [].concat(d, e)
+      )
+    ));
   const cartesianNd = (a, b, ...c) => (b ? cartesian(cartesian(a, b), ...c) : a);
 
   function Image(im) {
     this.im = im;
 
     // randomly sample coords that differ by more than threshold [0.0,1.0],
-  	// with sampleProb probability of passing through
+    // with sampleProb probability of passing through
     this.getDiffCoords = function(im2, thresh, sampleProb) {
-  	  sampleProb = (sampleProb==undefined) ? 1.0 : sampleProb;
-  	  var mat1 = this.getInvGreyscaleMat();
-  		var mat2 = im2.getInvGreyscaleMat();
-  		return _.filter(
-  		  // Get all possible coords
-  			cartesian(_.range(mat1[0].length), _.range(mat1.length)),
-  			// Filter function
-  		  (xy) => {
-  		    let x = xy[0], y = xy[1];
-  			  // pass if difference >= threshold and filter on sampling probability
-  		    return (Math.abs(mat1[y][x] - mat2[y][x]) >= thresh*255) &&
-  				  Math.random() < sampleProb;
-  		  },
-  		);
-  	}
+      sampleProb = (sampleProb==undefined) ? 1.0 : sampleProb;
+      var mat1 = this.getInvGreyscaleMat();
+      var mat2 = im2.getInvGreyscaleMat();
+      return _.filter(
+        // Get all possible coords
+        cartesian(_.range(mat1[0].length), _.range(mat1.length)),
+        // Filter function
+        (xy) => {
+          let x = xy[0], y = xy[1];
+          // pass if difference >= threshold and filter on sampling probability
+          return (Math.abs(mat1[y][x] - mat2[y][x]) >= thresh*255) &&
+            Math.random() < sampleProb;
+        },
+      );
+    }
 
     this.getCenterOfMass = function() {
       var mat = this.getInvGreyscaleMat();
-  		var m=0, cx=0, cy=0;
-  		for (var y=0; y<mat.length; y++) {
-  		  for (var x=0; x<mat[0].length; x++) {
-  			  m += mat[y][x];
-  			  cx += mat[y][x] * x;
-  			  cy += mat[y][x] * y;
-  			}
-  		}
+      var m=0, cx=0, cy=0;
+      for (var y=0; y<mat.length; y++) {
+        for (var x=0; x<mat[0].length; x++) {
+          m += mat[y][x];
+          cx += mat[y][x] * x;
+          cy += mat[y][x] * y;
+        }
+      }
       return [Math.round(cx/m), Math.round(cy/m)];
     }
 
     // Get 2d matrix containing just greyscale values at each RGBA pixel,
-  	// inverted so that black=high, white=low
+    // inverted so that black=high, white=low
     this.getInvGreyscaleMat = function() {
       return _.chunk(
-  		  _.map(
-  			  // Chunk the 1D list into RGBA 4-tuples
-  				_.chunk(this.im.data, 4),
-  				// Invert values
-  				(p) => (255 - _.min(p.slice(0,3))),
-  			// finally, reshape into a width x height 2D array
-  			), this.im.width,
-  		);
+        _.map(
+          // Chunk the 1D list into RGBA 4-tuples
+          _.chunk(this.im.data, 4),
+          // Invert values
+          (p) => (255 - _.min(p.slice(0,3))),
+        // finally, reshape into a width x height 2D array
+        ), this.im.width,
+      );
     }
 
     // strip color and replace with greyscale values
     this.filterBW = function() {
-  		for (var i=0; i<this.im.data.length; i+=4) {  // rgba 4-tuple
+      for (var i=0; i<this.im.data.length; i+=4) {  // rgba 4-tuple
         let v = _.max(this.im.data.slice(i, i+3));
         // Set the RGB vals to the new HSV val, leaving alpha unchanged.
         _.each(_.range(3), (j) => { this.im.data[i+j] = v });
