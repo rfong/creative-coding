@@ -6,11 +6,19 @@
 
   <script src="benchmark.js"></script>
 
+  <script src="webcam.js"></script>
+
 </head>
 
 <body>
   <p>Benchmarks for MVP of Pyodide port of ghostlines.</p>
   <p>Open console for results.</p>
+
+  <div class="camera">
+    <video id="video" class="hidden">Video stream not available.</video>
+  </div>
+  <canvas id="video-mirror"></canvas>
+  <canvas id="output"></canvas>
 </body>
 
 </html>

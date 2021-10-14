@@ -27,7 +27,8 @@ document.addEventListener("DOMContentLoaded", function() {
   function profileImageHandler(imageHandler, nTimes, benchmarkName) {
     var times = [];
     for (var i in _.range(nTimes)) {
-      var data = generateRGBImage(imageHeight, imageWidth);
+      //var data = generateRGBImage(imageHeight, imageWidth);
+      var data = document.getElementById('video-mirror').getContext('2d').getImageData(0,0,imageWidth, imageHeight);
       var now = performance.now();
       imageHandler(data);
       times.push(performance.now() - now);
@@ -72,20 +73,33 @@ document.addEventListener("DOMContentLoaded", function() {
         )
       );
     }
-    profileImageHandler(bmStripRgbInJs, 10, "strip RGB in JS then pass to Py");
+    profileImageHandler(bmStripRgbInJs, 10, "strip RGB in JS");
 
     // This passes RGB to pyodide and lets pyodide strip RGB to greyscale.
     async function bmStripRgbInPy(data) {
       await pyodide.globals.set("imdata", data);
-      await pyodide.runPython("print(type(imdata.to_py()))")
+      //await pyodide.runPython("print(type(imdata.to_py()))")
+      console.log("bmStripRgbInPy");
       await pyodide.runPython(
-        _.template("Image(imdata.to_py(), {{h}}, {{w}}).get_greyscale_mat()")({
+        _.template("Image(imdata.to_py(), {{h}}, {{w}}).get_bws()")({
           h: imageHeight,
           w: imageWidth,
         })
       );
     }
     profileImageHandler(bmStripRgbInPy, 10, "strip RGB in Py");
+
+    // This runs Image.get_output() in pyodide.
+    async function bmProcessImage(data) {
+      await pyodide.globals.set("imdata", data);
+      await pyodide.runPython(
+        _.template("Image(imdata.to_py(), {{h}}, {{w}}).get_output()")({
+          h: imageHeight,
+          w: imageWidth,
+        })
+      );
+    }
+    profileImageHandler(bmProcessImage, 10, "run image processing in Py");
 
   }
   let pyodideReadyPromise = main();
