@@ -26,12 +26,23 @@
 
   	<p>It's just an ASCII conversion of your webcam input (sampled at 10fps), using <a href="https://github.com/mir3z/aalib.js/">mir3z/aalib.js</a>.</p>
 
+    <div class="control">
+    <label for="brightnessSlider">brightness</label>
+    <input type="range" min="-100" max="100" value="15" class="slider" id="brightnessSlider">
+    </div>
+    <div class="control">
+    <label for="contrastSlider">contrast</label>
+    <input type="range" min="1" max="30" value="20" class="slider" id="contrastSlider">
+    </div>
+
     <div class="camera">
       <video id="video" class="hidden">Video stream not available.</video>
     </div>
     <canvas id="canvas" class="hidden"></canvas>
 
   	<div id="ascii-render"></div>
+
+    <p class="footnote">made 2021-07-07 at RC</p>
 
   </body>
 </html>

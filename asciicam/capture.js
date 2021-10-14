@@ -94,12 +94,18 @@
     }
   }
 
+  function getSliderVal(sliderId) {
+    return parseInt(document.getElementById(sliderId).value);
+  }
+
   function toAscii(aaImg, handlerFn) {
+    var contrast = getSliderVal("contrastSlider") / 10.0,
+        brightness = getSliderVal("brightnessSlider");
   	// Instantiate AA wrapper
     aaImg.map(aalib.aa({width: 300, height: 180}))
   	// Filter
-    .map(aalib.filter.contrast(1.5))
-    .map(aalib.filter.brightness(15))
+    .map(aalib.filter.brightness(brightness))
+    .map(aalib.filter.contrast(contrast))
   	// Render
     .map(aalib.render.html({
       el: document.getElementById("ascii-render"),
