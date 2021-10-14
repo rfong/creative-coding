@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <meta charset="utf-8" />
+
+    <!-- Vendor scripts -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  	<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Page scripts -->
+    <script src="capture.js"></script>
+
+    <style>
+      .hidden { display: none; }
+      #render { line-height: 0.8em; }
+    </style>
+
+  </head>
+  <body>
+
+  	<a href="../index.html"><< back</a>
+
+    <h1>dithercam</h1>
+
+  	<p>A 1-bit dithered webcam input (sampled at 8fps), using <a href="https://github.com/tgiachett/canvas-floyd-steinberg-dither">tgiachett/canvas-floyd-steinberg-dither</a>.</p>
+
+    <div class="camera">
+      <video id="video" class="hidden">Video stream not available.</video>
+    </div>
+    <canvas id="canvas">Canvas not available.</canvas>
+
+    <p>
+      <code id="status"></code>
+    </p>
+
+    <p class="footnote">made 2021-10-14</p>
+
+  </body>
+</html>
