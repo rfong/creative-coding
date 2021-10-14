@@ -2,6 +2,17 @@
 // https://github.com/mdn/samples-server/blob/master/s/webrtc-capturestill/capture.js
 
 (function() {
+
+  // Set lodash template settings
+  _.templateSettings = {
+    interpolate: /\{\{(.+?)\}\}/g,  // {{ attr }}
+    evaluate: /\{\%(.+?)\%\}/g,     // {% expr %}
+    escape: /\{\{-(.+?)\}\}/g,      // {{- escaped }}
+  };
+
+  var asciiWidth = 240;
+  var asciiHeight = 144;
+
   // The width and height of the captured photo. We will set the
   // width to the value defined here, but the height will be
   // calculated based on the aspect ratio of the input stream.
@@ -29,7 +40,7 @@
     startbutton = document.getElementById('startbutton');
 
     // TODO: cross-browser support?
-  	navigator.mediaDevices.getUserMedia({video: true, audio: false})
+    navigator.mediaDevices.getUserMedia({video: true, audio: false})
     .then(function(stream) {
       video.srcObject = stream;
       video.play();
@@ -88,7 +99,7 @@
 
       // Read image from source & kick off async ascii conversion pipeline
       var im = context.getImageData(0, 0, width, height);
-      toAscii(aalib.read.imageData.fromImageData(im), null);
+      toAscii(aalib.read.imageData.fromImageData(im), function(){});
     } else {
       clearphoto();
     }
@@ -99,21 +110,42 @@
   }
 
   function toAscii(aaImg, handlerFn) {
+    var now = performance.now();
     var contrast = getSliderVal("contrastSlider") / 10.0,
         brightness = getSliderVal("brightnessSlider");
-  	// Instantiate AA wrapper
-    aaImg.map(aalib.aa({width: 300, height: 180}))
-  	// Filter
+    // Instantiate AA wrapper
+    var aaImg = aaImg.map(aalib.aa({width: asciiWidth, height: asciiHeight}))
+    // Filter
     .map(aalib.filter.brightness(brightness))
     .map(aalib.filter.contrast(contrast))
-  	// Render
+    // Render
     .map(aalib.render.html({
       el: document.getElementById("ascii-render"),
       color: '#000',
       charset: aalib.charset.SIMPLE_CHARSET,
-    }))
-  	// Execute/observe
-  	.subscribe(handlerFn);
+    }));
+
+    // Execute/observe
+    aaImg.subscribe(function() {
+      // Print performance info
+      var ms = parseInt(performance.now() - now);
+      document.getElementById("status").innerHTML = _.template(
+        "processed image in {{ms}} ms<br/>" + 
+        "original dimensions: {{width}}x{{height}} pixels<br/>" +
+        "ASCII dimensions: {{aWidth}}x{{aHeight}} chars<br/>" +
+        "uncompressed size of data: {{kb}} Kbytes<br/>",
+      )({
+        ms: ms,
+        kb: 7 * asciiWidth * asciiHeight / 1000.,
+        aWidth: asciiWidth,
+        aHeight: asciiHeight,
+        width: width,
+        height: height,
+      });
+      
+      // Run the post handler
+      handlerFn();
+    });
   }
 
   // Set up our event listener to run the startup process

@@ -104,7 +104,7 @@
       canvas.toBlob(function(blob){
         document.getElementById("status").innerHTML = _.template(
           "processed image in {{ms}} ms<br/>" + 
-          "blob size: {{kb}} Kbytes<br/>" +
+          "raw blob size: {{kb}} Kbytes<br/>" +
           "image size: {{width}}x{{height}}",
         )({
           ms: ms,
