@@ -73,35 +73,34 @@
   // other changes before drawing it.
 
   function takepicture() {
-    var ctx = canvas.getContext('2d');
+    let ctx = canvas.getContext('2d');
     if (width && height) {
       canvas.width = width;
       canvas.height = height;
 
-      var now = performance.now();
+      let now = performance.now();
       ctx.drawImage(video, 0, 0, width, height);
 
       // Read image from source
-      var imdata = ctx.getImageData(0, 0, width, height);
-      var im = new Image(imdata);
-      im.contrast(50);
-      im.brighten(50);
-      ctx.putImageData(im.im, 0, 0);
+      let imdata = ctx.getImageData(0, 0, width, height);
+
+      // Apply image filters and redraw image
+      filterBW(imdata);
+      contrast(imdata, 50);
+      brighten(imdata, 50);
+      ctx.putImageData(imdata, 0, 0);
 
       // calculate centroid
-      centroid = im.getCenterOfMass();
+      centroid = getCenterOfMass(imdata);
      
       // draw centroid
       //drawCentroidMotion(ctx, centroid, priorCenter);
 
-      var dx = priorCenter ? centroid[0] - priorCenter[0] : undefined,
+      let dx = priorCenter ? centroid[0] - priorCenter[0] : undefined,
           dy = priorCenter ? centroid[1] - priorCenter[1] : undefined;
 
       if (priorFrame) {
-        console.log((performance.now() - now) + " ms elapsed since start of process");
-        var now2 = performance.now();
-        diff = im.getDiffCoords(priorFrame, 0.4, 0.01);
-        console.log((performance.now() - now2) + " ms to calculate diff coords");
+        diff = getDiffCoords(imdata, priorFrame, 0.4, 0.01);
         console.log(diff.length, "sample coords");
 
         // Draw many lines
@@ -116,9 +115,10 @@
 
       // save for next run
       priorCenter = centroid;
-      priorFrame = im;
+      priorFrame = imdata;
 
       console.log((performance.now() - now) + " ms to process frame");
+      console.log("DONE WITH FRAME");
 
     } else {
       clearphoto();
@@ -159,94 +159,86 @@
     ));
   const cartesianNd = (a, b, ...c) => (b ? cartesian(cartesian(a, b), ...c) : a);
 
-  function Image(im) {
-    this.im = im;
+  // randomly sample coords that differ by more than threshold [0.0,1.0],
+  function getDiffCoords(im1, im2, thresh, sampleProb) {
+    sampleProb = (sampleProb==undefined) ? 1.0 : sampleProb;
+    let h = im1.height, w = im1.width;
+    let coords = [];
 
-    // randomly sample coords that differ by more than threshold [0.0,1.0],
-    this.getDiffCoords = function(im2, thresh, sampleProb) {
-      sampleProb = (sampleProb==undefined) ? 1.0 : sampleProb;
-      let h = this.im.height, w = this.im.width;
-      let coords = [];
-
-      // Randomly sample up to 10k points
-      for (let i=0; i<10000; i++) {
-        var x = _.random(w), y = _.random(h);
-        var ind = (y*w + x)*4;
-        if (Math.abs(this.im.data[ind] - im2.im.data[ind]) >= thresh*255) {
-          coords.push([x, y]);
-        }
-      }
-      return coords;
-    }
-
-    // Return center of mass XY coordintaes in terms of pixels
-    this.getCenterOfMass = function() {
-      var m=0, cx=0, cy=0;
-      let h = this.im.height, w = this.im.width;
-      for (var y=0; y<h; y++) {
-        for (var x=0; x<w; x++) {
-          d = this.im.data[(y*w + x)*4];
-          m += d;
-          cx += d * x;
-          cy += d * y;
-        }
-      }
-      return [Math.round(cx/m), Math.round(cy/m)];
-    }
-
-    // (in-place operation) strip color and replace with greyscale values
-    this.filterBW = function() {
-      for (var i=0; i<this.im.data.length; i+=4) {  // rgba 4-tuple
-        let v = _.max(this.im.data.slice(i, i+3));
-        // Set the RGB vals to the new HSV val, leaving alpha unchanged.
-        _.each(_.range(3), (j) => { this.im.data[i+j] = v });
+    // Randomly sample up to 10k points
+    for (let i=0; i<10000; i++) {
+      let x = _.random(w), y = _.random(h);
+      let ind = (y*w + x)*4;
+      if (Math.abs(im1.data[ind] - im2.data[ind]) >= thresh*255) {
+        coords.push([x, y]);
       }
     }
+    return coords;
+  }
 
-    // Apply thresholding filter to image data
-    this.threshold = function(thresh) {  // input vals [0.0...1.0]
-      var d = this.im.data;
-      for (var i=0;i<d.length;i+=4){   //r,g,b,a
-        // set high if pixel is over threshold; else set low.
-        var val = (this.rgbToVal(d.slice(i, i+3)) > thresh) ? 255 : 0;
-        // set RGB values
-        _.each(_.range(i, i+3), (ind) => d[ind] = val);
+  // Return center of mass XY coordintaes in terms of pixels
+  function getCenterOfMass(im) {
+    let m=0, cx=0, cy=0;
+    let h = im.height, w = im.width;
+    for (let y=0; y<h; y++) {
+      for (let x=0; x<w; x++) {
+        d = im.data[(y*w + x)*4];
+        m += d;
+        cx += d * x;
+        cy += d * y;
       }
-      this.im.data = d;
     }
+    return [Math.round(cx/m), Math.round(cy/m)];
+  }
+
+  // (in-place operation) strip color and replace with greyscale values
+  function filterBW(im) {
+    for (let i=0; i<im.data.length; i+=4) {  // rgba 4-tuple
+      let v = _.max(im.data.slice(i, i+3));
+      im.data[i] = im.data[i+1] = im.data[i+2] = v;
+    }
+  }
+
+  // Apply thresholding filter to image data
+  function threshold(im, thresh) {  // input vals [0.0...1.0]
+    let d = im.data;
+    for (let i=0;i<d.length;i+=4){   //r,g,b,a
+      // set high if pixel is over threshold; else set low.
+      let val = (rgbToVal(d.slice(i, i+3)) > thresh) ? 255 : 0;
+      // set RGB values
+      _.each(_.range(i, i+3), (ind) => d[ind] = val);
+    }
+    im.data = d;
+  }
   
-    // static method; map down from 255 space to unit float space.
-    this.rgbToVal = function(rgbArr) {
-      return _.max(_.map(rgbArr, (x) => x/255.0));
-    }
+  // static method; map down from 255 space to unit float space.
+  function rgbToVal(rgbArr) {
+    return _.max(_.map(rgbArr, (x) => x/255.0));
+  }
  
-    // Apply brightening filter to image data
-    this.brighten = function(b) {
-      var d = this.im.data;
-      for(var i=0;i<d.length;i+=4){   //r,g,b,a
-        d[i] = d[i] + b;
-        d[i+1] = d[i+1] + b;
-        d[i+2] = d[i+2] + b;
-      }
-      this.im.data = d;
+  // Apply brightening filter to image data
+  function brighten(im, b) {
+    let d = im.data;
+    for(let i=0;i<d.length;i+=4){   //r,g,b,a
+      d[i] = d[i] + b;
+      d[i+1] = d[i+1] + b;
+      d[i+2] = d[i+2] + b;
     }
-  
-    // Apply contrast filter to image data
-    this.contrast = function(ctr){  //input range [-100..100]
-      var d = this.im.data;
-      ctr = (ctr/100) + 1;  //convert to decimal & shift range: [0..2]
-      var intercept = 128 * (1 - ctr);
-      for(var i=0;i<d.length;i+=4){   //r,g,b,a
-        d[i] = d[i]*ctr + intercept;
-        d[i+1] = d[i+1]*ctr + intercept;
-        d[i+2] = d[i+2]*ctr + intercept;
-      }
-      this.im.data = d;
-    }
+    im.data = d;
+  }
 
-    // discard RGB data
-    this.filterBW();
-  }  // End Image class definition
+  // Apply contrast filter to image data
+  function contrast(im, ctr){  //input range [-100..100]
+    let d = im.data;
+    ctr = (ctr/100) + 1;  //convert to decimal & shift range: [0..2]
+    let intercept = 128 * (1 - ctr);
+    for(let i=0;i<d.length;i+=4){   //r,g,b,a
+      d[i] = d[i]*ctr + intercept;
+      d[i+1] = d[i+1]*ctr + intercept;
+      d[i+2] = d[i+2]*ctr + intercept;
+    }
+    im.data = d;
+  }
 
   // Set up our event listener to run the startup process
   // once loading is complete.
