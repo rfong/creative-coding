@@ -52,7 +52,7 @@
 
     setInterval(function(ev) {
       takepicture();
-    }, 200);
+    }, 100);
 
     //clearphoto();
   }
