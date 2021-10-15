@@ -77,18 +77,21 @@
     if (width && height) {
       canvas.width = width;
       canvas.height = height;
+
+      var now = performance.now();
       ctx.drawImage(video, 0, 0, width, height);
 
       // Read image from source
       var imdata = ctx.getImageData(0, 0, width, height);
       var im = new Image(imdata);
-      im.filterBW();
       im.contrast(50);
       im.brighten(50);
       ctx.putImageData(im.im, 0, 0);
 
       // calculate centroid
+      var now2 = performance.now();
       centroid = im.getCenterOfMass();
+      console.log((performance.now() - now2) + " ms to calculate CoM");
      
       // draw centroid
       //drawCentroidMotion(ctx, centroid, priorCenter);
@@ -108,6 +111,8 @@
       // save for next run
       priorCenter = centroid;
       priorFrame = im;
+
+      console.log((performance.now() - now) + " ms to process frame");
 
     } else {
       clearphoto();
@@ -151,46 +156,36 @@
     // with sampleProb probability of passing through
     this.getDiffCoords = function(im2, thresh, sampleProb) {
       sampleProb = (sampleProb==undefined) ? 1.0 : sampleProb;
-      var mat1 = this.getInvGreyscaleMat();
-      var mat2 = im2.getInvGreyscaleMat();
+      let h = this.im.height, w = this.im.width;
       return _.filter(
         // Get all possible coords
-        cartesian(_.range(mat1[0].length), _.range(mat1.length)),
+        cartesian(_.range(w), _.range(h)),
         // Filter function
         (xy) => {
-          let x = xy[0], y = xy[1];
+          let ind = (xy[1]*w + xy[0])*4;
           // pass if difference >= threshold and filter on sampling probability
-          return (Math.abs(mat1[y][x] - mat2[y][x]) >= thresh*255) &&
-            Math.random() < sampleProb;
+          return (
+            Math.abs(
+              this.im.data[ind] - im2.im.data[ind]
+            ) >= thresh*255
+          ) && Math.random() < sampleProb;
         },
       );
     }
 
+    // Return center of mass XY coordintaes in terms of pixels
     this.getCenterOfMass = function() {
-      var mat = this.getInvGreyscaleMat();
       var m=0, cx=0, cy=0;
-      for (var y=0; y<mat.length; y++) {
-        for (var x=0; x<mat[0].length; x++) {
-          m += mat[y][x];
-          cx += mat[y][x] * x;
-          cy += mat[y][x] * y;
+      let h = this.im.height, w = this.im.width;
+      for (var y=0; y<h; y++) {
+        for (var x=0; x<w; x++) {
+          d = this.im.data[(y*w + x)*4];
+          m += d;
+          cx += d * x;
+          cy += d * y;
         }
       }
       return [Math.round(cx/m), Math.round(cy/m)];
-    }
-
-    // Get 2d matrix containing just greyscale values at each RGBA pixel,
-    // inverted so that black=high, white=low
-    this.getInvGreyscaleMat = function() {
-      return _.chunk(
-        _.map(
-          // Chunk the 1D list into RGBA 4-tuples
-          _.chunk(this.im.data, 4),
-          // Invert values
-          (p) => (255 - _.min(p.slice(0,3))),
-        // finally, reshape into a width x height 2D array
-        ), this.im.width,
-      );
     }
 
     // strip color and replace with greyscale values
@@ -240,6 +235,8 @@
       this.im.data = d;
     }
 
+    // discard RGB data
+    this.filterBW();
   }  // End Image class definition
 
   // Set up our event listener to run the startup process
