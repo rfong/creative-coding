@@ -163,24 +163,20 @@
     this.im = im;
 
     // randomly sample coords that differ by more than threshold [0.0,1.0],
-    // with sampleProb probability of passing through
     this.getDiffCoords = function(im2, thresh, sampleProb) {
       sampleProb = (sampleProb==undefined) ? 1.0 : sampleProb;
       let h = this.im.height, w = this.im.width;
-      return _.filter(
-        // Get all possible coords
-        cartesian(_.range(w), _.range(h)),
-        // Filter function
-        (xy) => {
-          let ind = (xy[1]*w + xy[0])*4;
-          // pass if difference >= threshold and filter on sampling probability
-          return (
-            Math.abs(
-              this.im.data[ind] - im2.im.data[ind]
-            ) >= thresh*255
-          ) && Math.random() < sampleProb;
-        },
-      );
+      let coords = [];
+
+      // Randomly sample up to 10k points
+      for (let i=0; i<10000; i++) {
+        var x = _.random(w), y = _.random(h);
+        var ind = (y*w + x)*4;
+        if (Math.abs(this.im.data[ind] - im2.im.data[ind]) >= thresh*255) {
+          coords.push([x, y]);
+        }
+      }
+      return coords;
     }
 
     // Return center of mass XY coordintaes in terms of pixels
