@@ -201,14 +201,12 @@
 
   // Apply thresholding filter to image data
   function threshold(im, thresh) {  // input vals [0.0...1.0]
-    let d = im.data;
-    for (let i=0;i<d.length;i+=4){   //r,g,b,a
+    for (let i=0; i<im.data.length; i+=4) {   //r,g,b,a
       // set high if pixel is over threshold; else set low.
-      let val = (rgbToVal(d.slice(i, i+3)) > thresh) ? 255 : 0;
+      let val = (rgbToVal(im.data.slice(i, i+3)) > thresh) ? 255 : 0;
       // set RGB values
-      _.each(_.range(i, i+3), (ind) => d[ind] = val);
+      im.data[0] = im.data[1] = im.data[2] = val;
     }
-    im.data = d;
   }
   
   // static method; map down from 255 space to unit float space.
@@ -218,26 +216,22 @@
  
   // Apply brightening filter to image data
   function brighten(im, b) {
-    let d = im.data;
-    for(let i=0;i<d.length;i+=4){   //r,g,b,a
-      d[i] = d[i] + b;
-      d[i+1] = d[i+1] + b;
-      d[i+2] = d[i+2] + b;
+    for (let i=0; i<im.data.length; i+=4) {   //r,g,b,a
+      im.data[i] = im.data[i] + b;
+      im.data[i+1] = im.data[i+1] + b;
+      im.data[i+2] = im.data[i+2] + b;
     }
-    im.data = d;
   }
 
   // Apply contrast filter to image data
   function contrast(im, ctr){  //input range [-100..100]
-    let d = im.data;
     ctr = (ctr/100) + 1;  //convert to decimal & shift range: [0..2]
     let intercept = 128 * (1 - ctr);
-    for(let i=0;i<d.length;i+=4){   //r,g,b,a
-      d[i] = d[i]*ctr + intercept;
-      d[i+1] = d[i+1]*ctr + intercept;
-      d[i+2] = d[i+2]*ctr + intercept;
+    for(let i=0;i<im.data.length;i+=4){   //r,g,b,a
+      im.data[i] = im.data[i]*ctr + intercept;
+      im.data[i+1] = im.data[i+1]*ctr + intercept;
+      im.data[i+2] = im.data[i+2]*ctr + intercept;
     }
-    im.data = d;
   }
 
   // Set up our event listener to run the startup process
