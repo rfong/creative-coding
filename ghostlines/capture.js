@@ -91,13 +91,9 @@
       // Apply image filters and redraw image
       let now2 = performance.now();
       filterBW(imdata);
-      console.log((performance.now()-now2) + " ms to filter BW");
-      now2 = performance.now();
       contrast(imdata, 50);
-      console.log((performance.now()-now2) + " ms to apply contrast");
       brighten(imdata, 50);
-      now2 = performance.now();
-      console.log((performance.now()-now2) + " ms to apply brightness");
+      console.log((performance.now()-now2) + " ms to apply image filters");
       ctx.putImageData(imdata, 0, 0);
 
       // calculate centroid
@@ -206,7 +202,7 @@
   // (in-place operation) strip color and replace with greyscale values
   function filterBW(im) {
     for (let i=0; i<im.data.length; i+=4) {  // rgba 4-tuple
-      let v = _.max(im.data.slice(i, i+3));
+      let v = _.max([im.data[i], im.data[i+1], im.data[i+2]]);
       im.data[i] = im.data[i+1] = im.data[i+2] = v;
     }
   }
