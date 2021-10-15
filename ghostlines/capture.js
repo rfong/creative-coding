@@ -89,9 +89,7 @@
       ctx.putImageData(im.im, 0, 0);
 
       // calculate centroid
-      var now2 = performance.now();
       centroid = im.getCenterOfMass();
-      console.log((performance.now() - now2) + " ms to calculate CoM");
      
       // draw centroid
       //drawCentroidMotion(ctx, centroid, priorCenter);
@@ -99,13 +97,21 @@
       var dx = priorCenter ? centroid[0] - priorCenter[0] : undefined,
           dy = priorCenter ? centroid[1] - priorCenter[1] : undefined;
 
-      // Draw many lines
       if (priorFrame) {
+        console.log((performance.now() - now) + " ms elapsed since start of process");
+        var now2 = performance.now();
         diff = im.getDiffCoords(priorFrame, 0.4, 0.01);
+        console.log((performance.now() - now2) + " ms to calculate diff coords");
         console.log(diff.length, "sample coords");
-        _.each(diff, (coord) => {
-          drawLine(ctx, coord, [coord[0]+dx, coord[1]+dy], "red");
-        });
+
+        // Draw many lines
+        ctx.beginPath();
+        for (let i=0; i<diff.length; i++) {
+          ctx.moveTo(diff[i][0], diff[i][1]);
+          ctx.lineTo(diff[i][0] + dx, diff[i][1] + dy);
+        }
+        ctx.strokeStyle = "red";
+        ctx.stroke();
       }
 
       // save for next run
@@ -119,6 +125,7 @@
     }
   }
 
+  // For debugging, draw the motion of the centroid between frames.
   function drawCentroidMotion(ctx, centroid, priorCenter) {
     ctx.beginPath();
     ctx.arc(centroid[0], centroid[1], 5, 0, 2*Math.PI);
@@ -130,6 +137,9 @@
     }
   }
 
+  // Draw one line using Canvas API.
+  // Note that using `beginPath()` and `stroke()` each time is not performant 
+  // when drawing many lines.
   function drawLine(ctx, xy1, xy2, style) {
     ctx.beginPath();
     ctx.moveTo(xy1[0], xy1[1]);
@@ -188,7 +198,7 @@
       return [Math.round(cx/m), Math.round(cy/m)];
     }
 
-    // strip color and replace with greyscale values
+    // (in-place operation) strip color and replace with greyscale values
     this.filterBW = function() {
       for (var i=0; i<this.im.data.length; i+=4) {  // rgba 4-tuple
         let v = _.max(this.im.data.slice(i, i+3));
@@ -197,6 +207,7 @@
       }
     }
 
+    // Apply thresholding filter to image data
     this.threshold = function(thresh) {  // input vals [0.0...1.0]
       var d = this.im.data;
       for (var i=0;i<d.length;i+=4){   //r,g,b,a
@@ -212,7 +223,8 @@
     this.rgbToVal = function(rgbArr) {
       return _.max(_.map(rgbArr, (x) => x/255.0));
     }
-  
+ 
+    // Apply brightening filter to image data
     this.brighten = function(b) {
       var d = this.im.data;
       for(var i=0;i<d.length;i+=4){   //r,g,b,a
@@ -223,6 +235,7 @@
       this.im.data = d;
     }
   
+    // Apply contrast filter to image data
     this.contrast = function(ctr){  //input range [-100..100]
       var d = this.im.data;
       ctr = (ctr/100) + 1;  //convert to decimal & shift range: [0..2]
