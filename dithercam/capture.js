@@ -149,21 +149,27 @@
           break;
       ;} else {
         let oldPixel = dataTrg[i];
-        let newPixel = findClosestPalCol(dataTrg[i]);
-    
+        let newPixel = findClosestPaletteColor(dataTrg[i]);
         dataTrg[i] = dataTrg[i+1] = dataTrg[i+2] = newPixel;
-        let quantError = oldPixel - newPixel;
-        dataTrg[i+4] = dataTrg[i+4] + quantError * (7 / 16);
-        dataTrg[i+(im.width * 4)] = dataTrg[i+(im.width * 4)] + quantError * (5 / 16);
-        dataTrg[i+(im.width* 4 -4)] = dataTrg[i+(im.width*4 -4)] + quantError * (3 / 16);
-        dataTrg[i+(im.width* 4 +4)] = dataTrg[i+(im.width * 4 +4)] + quantError * (1 / 16);
+
+        // error diffusion
+        let quantError = (oldPixel - newPixel)/16;
+        // east
+        dataTrg[i+4] = dataTrg[i+4] + quantError * 7;
+        // south
+        dataTrg[i+(im.width * 4)] = dataTrg[i+(im.width * 4)] + quantError * 5;
+        // southwest
+        dataTrg[i+(im.width* 4 -4)] = dataTrg[i+(im.width*4 -4)] + quantError * 3;
+        // southeast
+        dataTrg[i+(im.width* 4 +4)] = dataTrg[i+(im.width * 4 +4)] + quantError * 1;
       }
     }
 
     ctx.putImageData(idataTrg, 0, 0);
   }
 
-  function findClosestPalCol(srcPx) {
+  // Find closest color, for B&W palette
+  function findClosestPaletteColor(srcPx) {
     if(256-srcPx < 256/2) {
       return 255;
     } else {
