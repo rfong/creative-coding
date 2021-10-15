@@ -79,18 +79,29 @@
       canvas.height = height;
 
       let now = performance.now();
+      // Unfortunately there is no workaround to capturing the image data 
+      // other than rendering it to canvas first, so we will end up drawing
+      // on a canvas twice per frame.
       ctx.drawImage(video, 0, 0, width, height);
 
       // Read image from source
       let imdata = ctx.getImageData(0, 0, width, height);
+      console.log((performance.now()-now) + " ms to capture from video");
 
       // Apply image filters and redraw image
+      let now2 = performance.now();
       filterBW(imdata);
+      console.log((performance.now()-now2) + " ms to filter BW");
+      now2 = performance.now();
       contrast(imdata, 50);
+      console.log((performance.now()-now2) + " ms to apply contrast");
       brighten(imdata, 50);
+      now2 = performance.now();
+      console.log((performance.now()-now2) + " ms to apply brightness");
       ctx.putImageData(imdata, 0, 0);
 
       // calculate centroid
+      now2 = performance.now();
       centroid = getCenterOfMass(imdata);
      
       // draw centroid
@@ -112,13 +123,14 @@
         ctx.strokeStyle = "red";
         ctx.stroke();
       }
+      console.log((performance.now()-now2) + " ms to do math and draw lines");
 
       // save for next run
       priorCenter = centroid;
       priorFrame = imdata;
 
       console.log((performance.now() - now) + " ms to process frame");
-      console.log("DONE WITH FRAME");
+      console.log("-----");
 
     } else {
       clearphoto();
