@@ -159,6 +159,7 @@ function make(id, width, height, zoom, fn, webgl = false) {
       p.after();
     };
 
+    // Mouse position helper functions
     p.mouseXInBounds = () => p.mouseX > 0 && p.mouseX < p.width - 1;
     p.mouseYInBounds = () => p.mouseY > 0 && p.mouseY < p.height - 1;
     p.mouseInBounds = () => p.mouseXInBounds() && p.mouseYInBounds();
@@ -170,6 +171,7 @@ function make(id, width, height, zoom, fn, webgl = false) {
     p.getMousePixelX = () => p.floor(p.getMouseX());
     p.getMousePixelY = () => p.floor(p.getMouseY());
 
+    // Mouse drawing helper functions
     p.drawMouse = () => p.drawMouseCircle(2, "#fff");
 
     p.drawMouseCircle = (radius, color) => {
