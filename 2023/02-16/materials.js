@@ -2,6 +2,8 @@ class Particle {
   constructor({color, empty} = {}) {
     this.color = color;
     this.empty = empty ?? false;
+    this.modified = false;
+    this.isLiquid = false;
   }
   update() {}
 }
@@ -13,6 +15,7 @@ class Empty extends Particle {
   }
 }
 
+// A particle that falls (is subject to gravity-based acceleration)
 class ParticleWithVelocity extends Particle {
   constructor(params) {
     super(params);
@@ -58,7 +61,6 @@ class Sand extends ParticleWithVelocity {
   static nickname = "Sand";
   static baseColor = "#dcb159";
   static addProbability = 0.5;
-
   constructor(p) {
     super({color: p.varyColor(Sand.baseColor)});
   }
@@ -70,6 +72,7 @@ class Water extends ParticleWithVelocity {
   static addProbability = 0.5;
   constructor(p) {
     super({color: p.varyColor(Water.baseColor)});
+    this.isLiquid = true;
   }
 }
 

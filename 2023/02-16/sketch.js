@@ -92,26 +92,54 @@ class Grid {
     }
   }
 
-  // The physics behavior for one update step
-  updatePixel(i) {
+  // Cellular automaton behavior for one pixel
+  updatePixelWithGravity(i, leftToRight) {
     if (this.isEmpty(i)) { return; }
 
+    // Falling behavior (with checks to prevent wrapping around the screen)
     const below = i + this.width;
     const belowLeft = below - 1;
     const belowRight = below + 1;
     const column = i % this.width;
-
-    // If there are no pixels below, including diagonals, move it accordingly.
     if (this.isEmpty(below)) {
       this.swap(i, below);
       return below;
     } else if (this.isEmpty(belowLeft) && belowLeft % this.width < column) {
       this.swap(i, belowLeft);
-      return below;
+      return belowLeft;
     } else if (this.isEmpty(belowRight) && belowRight % this.width > column) {
       this.swap(i, belowRight);
-      return below;
+      return belowRight;
     }
+
+    // Simulate sideways motion for liquids
+    const particle = this.grid[i];
+    if (particle && particle.isLiquid) {
+      // If this row of particles is getting processed left to right, then 
+      // flowing left takes precedence. Otherwise, right takes precedence.
+      let posns = leftToRight ? [i-1, i+1] : [i+1, i-1];
+      for (let j=0; j<posns.length; j++) {
+        let pos = posns[j];
+        if (this.isEmpty(pos) && 
+            (pos % this.width < i % this.width) == (pos < i)) {
+          this.swap(i, pos);
+          console.log(i, "->", pos);
+          return pos;
+        }
+      }
+      /*
+      if (this.isEmpty(left) && left % this.width < column) {
+        // Flow left
+        this.swap(i, left);
+        return left;
+      } else if (this.isEmpty(right) && right & this.width > column) {
+        // Flow right
+        this.swap(i, right);
+        return right;
+      }
+      */
+    }
+    
     // rfong bookmark
     // Add wind. Gravity takes precedence over wind.
     // A particle will only be moved by wind if nothing is on top of it.
@@ -126,7 +154,8 @@ class Grid {
     return i;
   }
 
-  // Run updates for every particle in the grid
+  // Run updates for every modified particle in the grid. Static particles
+  // are not subject to gravity.
   update() {
     this.cleared = false;
     this.modifiedIndices = new Set();
@@ -136,6 +165,8 @@ class Grid {
     // Iterate through particles and run updates
     for (let row = this.rowCount - 1; row >= 0; row--) {
       const rowOffset = row * this.width;
+      // Randomly pick a direction to loop over this column in. This is so that
+      // we don't have hardcoded bias from either the left or right.
       const leftToRight = Math.random() > 0.5;
       for (let i = 0; i < this.width; i++) {
         // Go from right to left or left to right depending on our random value
@@ -155,8 +186,13 @@ class Grid {
         }
 
         // Update the number of times the particle instructs us to
+        // TODO: something weird is happening with water, the update counts
+        // never stop
+        let c = particle.getUpdateCount();
+        if (c>1) { console.log(c); }
+
         for (let v = 0; v < particle.getUpdateCount(); v++) {
-          const newIndex = this.updatePixel(index);
+          const newIndex = this.updatePixelWithGravity(index, leftToRight);
 
           // If we swapped the particle to a new location,
           // we need to update our index to be that new one.
