@@ -24,6 +24,7 @@ class Particle {
 }
 
 class Empty extends Particle {
+  static nickname = "Eraser";
   static baseColor = window.background;
   constructor() {
     super({empty: true});
@@ -46,11 +47,9 @@ class ParticleWithVelocity extends Particle {
 
   updateVelocity() {
     let newVelocity = this.velocity + this.acceleration;
-
     if (Math.abs(newVelocity) > this.maxSpeed) {
       newVelocity = Math.sign(newVelocity) * this.maxSpeed;
     }
-
     this.velocity = newVelocity;
   }
 
@@ -88,6 +87,8 @@ class Water extends ParticleWithVelocity {
   constructor(p) {
     super({color: p.varyColor(Water.baseColor)});
     this.isLiquid = true;
+    this.maxSpeed = 8;
+    this.acceleration = 2.0;
   }
 }
 

@@ -242,13 +242,6 @@ class Grid {
       });
     }
     p.updatePixels();
-
-    // rfong bookmark
-    // Add more continuous stuff from the side
-    // This isn't that interesting, too uniformly distributed.
-    //for (var i=0; i<5; i++) {
-    //  p.drawPoint(0, parseInt(p.random(20)));
-    //}
   }
 }
 
@@ -274,13 +267,10 @@ class ImprovedLogic extends Logic {
     }
     
     p.drawPoint = (x, y) => {
-      grid.set(
-          x, y, new this.currentParticleType(p)
-      );
+      grid.set(x, y, new this.currentParticleType(p));
     }
 
     p.setup_ = () => {
-      //p.addToggleRenderingButton();
       p.registerMaterials(
         this.availableMaterials,
         (material) => this.currentParticleType = material
@@ -317,14 +307,6 @@ class ImprovedLogic extends Logic {
         p.pause();
       }
     }
-  }
-}
-
-class OnlyUpdateModifiedGridFrameCounter extends Grid {
-  draw(p) {
-    super.draw(p);
-    frameNumber++;
-    frameCounter.textContent = frameNumber.toString();
   }
 }
 
