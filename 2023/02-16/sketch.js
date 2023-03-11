@@ -74,12 +74,6 @@ class Grid {
     this.setIndex(b, temp);
   }
 
-  // Return true if position at linear index is empty
-  isEmpty(index) {
-    // For now, if it's out of bounds, return "not empty"
-    return this.grid[index]?.empty ?? false;
-  }
-
   // Fill a circle with particles, given a constructor `createParticle`
   setCircle(x, y, createParticle, radius = 2, probability = 1.0) {
     let radiusSq = radius * radius;
@@ -92,52 +86,46 @@ class Grid {
     }
   }
 
+  // Return true if position at linear index is empty
+  isEmpty(index) {
+    // For now, if it's out of bounds, return "not empty"
+    return this.grid[index]?.empty ?? false;
+  }
+
   // Cellular automaton behavior for one pixel
   updatePixelWithGravity(i, leftToRight) {
     if (this.isEmpty(i)) { return; }
+    const particle = this.grid[i];
 
     // Falling behavior (with checks to prevent wrapping around the screen)
     const below = i + this.width;
     const belowLeft = below - 1;
     const belowRight = below + 1;
     const column = i % this.width;
-    if (this.isEmpty(below)) {
+    if (particle.canDisplace(this.grid[below])) {
       this.swap(i, below);
       return below;
-    } else if (this.isEmpty(belowLeft) && belowLeft % this.width < column) {
+    } else if (particle.canDisplace(this.grid[belowLeft]) && belowLeft % this.width < column) {
       this.swap(i, belowLeft);
       return belowLeft;
-    } else if (this.isEmpty(belowRight) && belowRight % this.width > column) {
+    } else if (particle.canDisplace(this.grid[belowRight]) && belowRight % this.width > column) {
       this.swap(i, belowRight);
       return belowRight;
     }
 
     // Simulate sideways motion for liquids
-    const particle = this.grid[i];
     if (particle && particle.isLiquid) {
       // If this row of particles is getting processed left to right, then 
       // flowing left takes precedence. Otherwise, right takes precedence.
       let posns = leftToRight ? [i-1, i+1] : [i+1, i-1];
       for (let j=0; j<posns.length; j++) {
         let pos = posns[j];
-        if (this.isEmpty(pos) && 
+        if (particle.canDisplace(this.grid[pos]) && 
             (pos % this.width < i % this.width) == (pos < i)) {
           this.swap(i, pos);
-          console.log(i, "->", pos);
           return pos;
         }
       }
-      /*
-      if (this.isEmpty(left) && left % this.width < column) {
-        // Flow left
-        this.swap(i, left);
-        return left;
-      } else if (this.isEmpty(right) && right & this.width > column) {
-        // Flow right
-        this.swap(i, right);
-        return right;
-      }
-      */
     }
     
     // rfong bookmark
@@ -188,8 +176,8 @@ class Grid {
         // Update the number of times the particle instructs us to
         // TODO: something weird is happening with water, the update counts
         // never stop
-        let c = particle.getUpdateCount();
-        if (c>1) { console.log(c); }
+        //let c = particle.getUpdateCount();
+        //if (c>1) { console.log(c); }
 
         for (let v = 0; v < particle.getUpdateCount(); v++) {
           const newIndex = this.updatePixelWithGravity(index, leftToRight);

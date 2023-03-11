@@ -6,6 +6,21 @@ class Particle {
     this.isLiquid = false;
   }
   update() {}
+
+  // Returns true if this particle can displace `p` & fall down through it.
+  // (Does not account for position or forces, being applies, since particles
+  // don't know that about themselves.)
+  // Solid beats liquid beats empty.
+  canDisplace(p) {
+    if (!(p instanceof Particle)) { return false; }
+    // If I'm empty, I can't displace.
+    if (this.empty) { return false; }
+    // If they are empty (and I'm not), I can displace them.
+    if (p.empty) { return true; }
+    // I'm liquid and they're solid, I can displace them.
+    if (!this.isLiquid && p.isLiquid) { return true; }
+    return false;
+  }
 }
 
 class Empty extends Particle {
