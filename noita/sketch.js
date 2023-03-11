@@ -310,4 +310,4 @@ class ImprovedLogic extends Logic {
   }
 }
 
-make('final', width, height, zoom, makeLogic(ImprovedLogic, Grid));
+make('p5-canvas', width, height, zoom, makeLogic(ImprovedLogic, Grid));

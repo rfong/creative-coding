@@ -19,10 +19,23 @@
 
     <h1>noita sandbox</h1>
     <p>prompt: Standing silently in the quiet snowfall</p>
-    <p>Not exactly on prompt, but I've always wanted to play around with a sand particle simulator.</p>
-    <p>I cribbed the canvas, UI, and event management code from <a href="https://jason.today/falling-sand">jason.today's excellent writeup</a> on making a falling sand pixel simulator. I did a bunch of refactoring and added water as a material.</p>
+    <p>Not exactly on prompt, but I've always wanted a 2d particle simulator. It's basically cellular automata with materials with various behaviors & physics. Draw on the canvas below to start.</p>
 
-    <main></main>
+    <div id="p5-canvas"></div>
+
+    <p>I just wanted to play around with the cellular automata aspect, so I cribbed the canvas, UI, event management code, and sand behavior from <a href="https://jason.today/falling-sand">jason.today's excellent writeup</a> on making a falling sand pixel simulator.</p>
+    <p>what I added:</p>
+    <ul>
+      <li>refactored the original code down to be much simpler/smaller</li>
+      <li>simple water simulation</li>
+    </ul>
+
+    <p>bugs to fix:</p>
+    <ul>
+      <li>water level should equalize between two tubes; need to simulate pressure</li>
+      <li>fix water jitter with the top row modulus remainder's worth of pixels</li>
+      <li>things can currently "fall" through an empty diagonal in an otherwise contiguous barrier</li>
+    </ul>
 
   </body>
 </html>
