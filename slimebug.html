@@ -16,8 +16,9 @@
     <h1>procedural slime bugs</h1>
     <p>Interesting observations about this sketch:</p>
     <ul>
-      <li>To simplify the math, the bugs are drawn within a translated relative frame of reference. However, the slime trails need to be drawn in absolute coordinates.</li>
       <li>A legitimate use case for "absolute butt coordinates"</li>
+      <li>To simplify the math, the bugs are drawn within a translated relative frame of reference.</li>
+      <li>However, the slime trails are much more easily drawn in absolute coordinates. (It would be possible but annoying to maintain relative coordinates for them.)</li>
       <li>The slime trails are attenuated without factoring in a time variable by using a stack of slime sizes that is decremented proportionally to the slime trail index.</li>
     </ul>
 
