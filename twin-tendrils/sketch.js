@@ -27,8 +27,22 @@ function setup() {
   xInt = width/numXIntervals;
 }
 
+// color palettes
+const palettes = {
+  "sun": {
+    "background": "#2c2a27",
+    "swatches": ["#FFCC16", "#D18130", "#FFF3B7", "#ed9600"],
+  },
+  "okeefe": {
+    "background": "#c46f8c",
+    "swatches": ["#9eacff", "#6638ff", "#9b38ff", "#5492ff", "#bdadd8"],
+  },
+};
+const paletteName = "okeefe";
+
 function draw() {
-  background("#2C2A27");
+  const palette = palettes[paletteName];
+  background(palette.background);
 
   xOff = xOff + 0.0025;
   yOff = yOff + 0.003;
@@ -65,15 +79,15 @@ function draw() {
     leftWidth += (moveRight ? 1 : -1) * 0.75;
   }
   
-  const points = [
-    getNoisePoints(xOff, xInt, leftWidth),
-    getNoisePoints(xOff+1, xInt, leftWidth),
-    getNoisePoints(yOff+3, xInt, leftWidth),
-    getNoisePoints(yOff+5, xInt, leftWidth),
-  ];
-  const colors = [
-    "#FFCC16", "#D18130", "#FFF3B7", "#ed9600",
-  ];
+  const colors = palette.swatches;
+  const points = [];
+  for (let i=0; i<colors.length; i++) {
+    if (i%2 == 0) {
+      points.push(getNoisePoints(xOff+i, xInt, leftWidth));
+    } else {
+      points.push(getNoisePoints(yOff+2+i, xInt, leftWidth));
+    }
+  }
   
   // draw left side beziers
   for (let i=0; i<points.length; i++) {
@@ -105,8 +119,13 @@ function getNoisePoints(offset, xInterval, leftWidth) {
   const points = [];
   for (let pointX = 0; pointX <= width/2; pointX += xInterval) {
     const pointY = ((noise(offset+pointX) * height) << 1) - (height >> 1);
-    points.push([pointX*leftWidth/width*2, pointY]);
+    points.push([pointX*leftWidth/width*2, boundY(pointY)]);
   }
   return points;
 }
 
+// keep `y` in canvas y-bounds
+function boundY(y) {
+  return max(0,
+    min(height, y));
+}
