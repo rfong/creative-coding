@@ -33,12 +33,12 @@ const palettes = {
     "background": "#2c2a27",
     "swatches": ["#FFCC16", "#D18130", "#FFF3B7", "#ed9600"],
   },
-  "okeefe": {
+  "amniotic": {
     "background": "#c46f8c",
-    "swatches": ["#9eacff", "#6638ff", "#9b38ff", "#5492ff", "#bdadd8"],
+    "swatches": ["#FFCC16", "#D18130", "#FFF3B7", "#ed9600"],
   },
 };
-const paletteName = "okeefe";
+const paletteName = "amniotic";
 
 function draw() {
   const palette = palettes[paletteName];
