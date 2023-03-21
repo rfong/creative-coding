@@ -23,10 +23,10 @@ function before(p) {
 // @width: canvas width
 // @height: canvas height
 // @p5WrapperFn: call `p5WrapperFn(p)` within p5 setup
-function make(id, width, height, p5WrapperFn, webgl = false) {
+// @zoom: the true display height/width of each "pixel" on the canvas
+function make(id, width, height, p5WrapperFn, zoom = null, webgl = false) {
 
-  // zoom: the true display height/width of each "pixel" on the canvas
-  const zoom = window.innerWidth >= width * 4 ? 4 : 2;
+  zoom = zoom ?? (window.innerWidth >= width * 4 ? 4 : 2);
 
   return new p5((p) => {
     p.isWEBGL = webgl;
