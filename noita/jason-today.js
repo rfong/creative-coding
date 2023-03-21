@@ -1,4 +1,5 @@
 // From https://jason.today/falling-improved
+// UI & event handling for falling sand simulator
 
 // Our Library
 window.background = window.darkMode ? "#1a1d21" : "#e5e2de";
@@ -17,8 +18,13 @@ function before(p) {
   p.background(p.backgroundColor || window.background);
 }
 
-// Simplify with some boilerplate
-function make(id, width, height, zoom, fn, webgl = false) {
+// Make a new p5 instance with:
+// @id: HTML ID of canvas element to attach to
+// @width: canvas width
+// @height: canvas height
+// @zoom: the true display height/width of each "pixel" on the canvas
+// @wrapperFn: call `wrapperFn(p)` within p5 setup
+function make(id, width, height, zoom, wrapperFn, webgl = false) {
   return new p5((p) => {
     p.isWEBGL = webgl;
     p.swatchBarSpacer = null;
@@ -220,8 +226,8 @@ function make(id, width, height, zoom, fn, webgl = false) {
       return p.color(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
     };
 
-    if (fn) {
-      fn(p);
+    if (wrapperFn) {
+      wrapperFn(p);
     }
 
     p.windowResized = () => {

@@ -150,10 +150,24 @@ class Grid {
 
     //updateWind();
     
-    // TODO: Recalculate pressure forces, iterating top-down through rows.
-    // Force calculations go top-down to simplify cumulative sum of weights.
-    // Note that this might change in the future if pressure comes from a
-    // source other than weight.
+    // TODO: Recalculate pressure forces. Pressure can be caused by weight
+    // above, or can radiate outward.
+    for (let col = 0; col < this.width; col++) {
+      let weight = 0;  // weight accumulated so far
+      for (let row = 0; row < this.rowCount; row++) { // top down
+        const index = col * this.rowCount + row;
+        const particle = this.grid[index];
+
+        // If it exerts no downward force, reset weight.
+        if (particle.weight ?? true) {
+          weight = 0;
+          continue;
+        }
+        // Otherwise, update pressure on curr particle, and accumulate weight.
+        particle.setPressure(weight);
+        weight += particle.weight;
+      }
+    }
 
     // Run updates, iterating bottom-up through rows.
     // Falling-based updates need to iterate bottom-up so that lower particles
@@ -252,8 +266,7 @@ class Grid {
   }
 }
 
-const w = 90;
-const zoomFn = () => window.innerWidth >= w * 4 ? 4 : 2;
+const zoomFn = () => window.innerWidth >= 90 * 4 ? 4 : 2;
 
 class ImprovedLogic extends Logic {
   currentParticleType = Sand;
