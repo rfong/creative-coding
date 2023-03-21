@@ -149,16 +149,23 @@ class Grid {
     this.modifiedIndices = new Set();
 
     //updateWind();
+    
+    // TODO: Recalculate pressure forces, iterating top-down through rows.
+    // Force calculations go top-down to simplify cumulative sum of weights.
+    // Note that this might change in the future if pressure comes from a
+    // source other than weight.
 
-    // Iterate through particles and run updates
+    // Run updates, iterating bottom-up through rows.
+    // Falling-based updates need to iterate bottom-up so that lower particles
+    // get out of the way before higher particles need to fall to their places
     for (let row = this.rowCount - 1; row >= 0; row--) {
       const rowOffset = row * this.width;
       // Randomly pick a direction to loop over this column in. This is so that
       // we don't have hardcoded bias from either the left or right.
       const leftToRight = Math.random() > 0.5;
-      for (let i = 0; i < this.width; i++) {
+      for (let col = 0; col < this.width; col++) {
         // Go from right to left or left to right depending on our random value
-        const columnOffset = leftToRight ? i : -i - 1 + this.width;
+        const columnOffset = leftToRight ? col : -col - 1 + this.width;
         let index = rowOffset + columnOffset;
         // If it's empty, skip this logic
         if (this.isEmpty(index)) { continue; }
@@ -173,12 +180,12 @@ class Grid {
           continue;
         }
 
-        // Update the number of times the particle instructs us to
         // TODO: something weird is happening with water, the update counts
         // never stop
         //let c = particle.getUpdateCount();
         //if (c>1) { console.log(c); }
-
+        //
+        // Update the number of times the particle instructs us to
         for (let v = 0; v < particle.getUpdateCount(); v++) {
           const newIndex = this.updatePixelWithGravity(index, leftToRight);
 
