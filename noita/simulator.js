@@ -1,18 +1,7 @@
 // Forked from https://jason.today/falling-improved
 
-// Math utility helpers
-// `bound` is inclusive
-function clipToAbsBound(val, bound) {
-  if (val > bound) return bound;
-  if (val < -1*bound) return -1*bound;
-  return val;
-}
-
 // Data structure for managing a grid of particles
 class Grid {
-  windDir = 1;
-  windUp = true;
-
   initialize(w, h) {
     this.width = w;
     this.height = h;
@@ -119,17 +108,6 @@ class Grid {
       }
     }
     
-    // rfong bookmark
-    // Add wind. Gravity takes precedence over wind.
-    // A particle will only be moved by wind if nothing is on top of it.
-    // This is neat at first but isn't interesting in the long run
-    // because all the sand ends up being flat.
-    /*
-    const ind = i + this.windDir + (this.windUp ? -1*this.width : 0);
-    if (!this.isEmpty(i-this.width) && this.isEmpty(ind)) {
-      this.swap(i, ind);
-    }
-    */
     return i;
   }
 
@@ -139,8 +117,6 @@ class Grid {
     this.cleared = false;
     this.modifiedIndices = new Set();
 
-    //updateWind();
-    
     // TODO: Recalculate pressure forces. Pressure can be caused by weight
     // above, or can radiate outward.
     for (let col = 0; col < this.width; col++) {
@@ -211,33 +187,7 @@ class Grid {
       }
     }
   }
-  /*
-  updateWind() {
-    // 5% probability of the wind changing directions.
-    if (Math.random() < 0.05) {
-      this.windDir *= -1;
-      console.log("wind direction changed to", this.windDir);
-    }
-    // 5% probability of the wind increasing in strength.
-    if (Math.random() < 0.05) {
-      this.windDir = clipToAbsBound(this.windDir*2, 4);
-      console.log("wind direction changed to", this.windDir);
-    }
-    // 5% probability of the wind decreasing in strength.
-    if (Math.random() < 0.05) {
-      this.windDir /= 2;
-      if (Math.abs(this.windDir) < 1) {
-        this.windDir = (this.windDir<0) ? -1 : 1;
-      }
-      console.log("wind direction changed to", this.windDir);
-    }
-    // 5% probability of wind upwardness changing.
-    if (Math.random() < 0.05) {
-      this.windUp = !this.windUp;
-      console.log("wind upwardness changed to", this.windUp);
-    }
-  }
-  */
+
   // We need to update if the grid needs to be cleared, or if we have any
   // modified indices that still need an update run over them.
   needsUpdate() {
