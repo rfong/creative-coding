@@ -22,9 +22,12 @@ function before(p) {
 // @id: HTML ID of canvas element to attach to
 // @width: canvas width
 // @height: canvas height
-// @zoom: the true display height/width of each "pixel" on the canvas
-// @wrapperFn: call `wrapperFn(p)` within p5 setup
-function make(id, width, height, zoom, wrapperFn, webgl = false) {
+// @p5WrapperFn: call `p5WrapperFn(p)` within p5 setup
+function make(id, width, height, p5WrapperFn, webgl = false) {
+
+  // zoom: the true display height/width of each "pixel" on the canvas
+  const zoom = window.innerWidth >= width * 4 ? 4 : 2;
+
   return new p5((p) => {
     p.isWEBGL = webgl;
     p.swatchBarSpacer = null;
@@ -88,8 +91,8 @@ function make(id, width, height, zoom, wrapperFn, webgl = false) {
     };
 
     p.canvas = null;
-    p.zoom = zoom;
 
+    p.zoom = zoom;
     p.calculateZoom = () => zoom;
     p.setZoom = (zoom) => {
       p.zoom = zoom;
@@ -226,8 +229,8 @@ function make(id, width, height, zoom, wrapperFn, webgl = false) {
       return p.color(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
     };
 
-    if (wrapperFn) {
-      wrapperFn(p);
+    if (p5WrapperFn) {
+      p5WrapperFn(p);
     }
 
     p.windowResized = () => {
@@ -256,9 +259,14 @@ class Logic {
   logic(p, grid) {}
 }
 
+// A factory function that returns a p5 wrapper function to use with `make`.
+// @logic: a subclass of Logic
+// @mapType: a class for managing particles
 function makeLogic(logic, mapType, {before} = {}) {
   return (p) => {
+    // If `before` was provided, call it with `p` as an argument.
     (before ?? ((_) => {}))(p);
+    // Set up`logic` and `mapType` instances.
     new logic().logic(p, new mapType());
   }
 }

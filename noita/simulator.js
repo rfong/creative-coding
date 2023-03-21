@@ -8,23 +8,14 @@ function clipToAbsBound(val, bound) {
   return val;
 }
 
-// constants
-const width = 180;
-const height = 90;
-const zoom = window.innerWidth >= width * 4 ? 4 : 2;
-const circleSize = Math.floor(width / 50);
-
-const frameCounter = document.querySelector(".frame-counter");
-let frameNumber = 0;
-
 // Data structure for managing a grid of particles
 class Grid {
   windDir = 1;
   windUp = true;
 
-  initialize(width, height) {
-    this.width = width;
-    this.height = height;
+  initialize(w, h) {
+    this.width = w;
+    this.height = h;
     this.clear();
     this.modifiedIndices = new Set();
     this.cleared = false;
@@ -266,29 +257,13 @@ class Grid {
   }
 }
 
-const zoomFn = () => window.innerWidth >= 90 * 4 ? 4 : 2;
-
 class ImprovedLogic extends Logic {
   currentParticleType = Sand;
   availableMaterials = [Sand, Water, Wood, Empty];
 
-  // Our main logic for this step!
+  // Define p5 logic
   logic(p, grid) {
     p.rendering = false;
-    p.calculateZoom = () => window.innerWidth - 40 >= width * 4 ? 4 : 2;
-
-    p.drawCircle = (x, y) => {
-      grid.setCircle(
-        x, y,
-        () => new this.currentParticleType(p), 
-        circleSize, 
-        this.currentParticleType.addProbability
-      );
-    }
-    
-    p.drawPoint = (x, y) => {
-      grid.set(x, y, new this.currentParticleType(p));
-    }
 
     p.setup_ = () => {
       p.registerMaterials(
@@ -300,19 +275,34 @@ class ImprovedLogic extends Logic {
           p.draw_();
       });
       grid.initialize(p.width, p.height);
+
+      p.circleSize = Math.floor(p.width / 50);
     };
+
+    p.drawCircle = (x, y) => {
+      grid.setCircle(
+        x, y,
+        () => new this.currentParticleType(p), 
+        p.circleSize, 
+        this.currentParticleType.addProbability
+      );
+    }
+    
+    p.drawPoint = (x, y) => {
+      grid.set(x, y, new this.currentParticleType(p));
+    }
 
     p.onLeftClick = (x, y) => {
       grid.setCircle(
         x, y, 
         () => new this.currentParticleType(p), 
-        circleSize, 
+        p.circleSize, 
         this.currentParticleType.addProbability
       );
     }
 
     p.onRightClick = () => grid.clear();
-    p.drawMouse = () => p.drawMouseCircle(circleSize, this.currentParticleType.baseColor);
+    p.drawMouse = () => p.drawMouseCircle(p.circleSize, this.currentParticleType.baseColor);
     p.draw_ = () => grid.draw(p);
     p.update = () => grid.update();
 
@@ -330,4 +320,4 @@ class ImprovedLogic extends Logic {
   }
 }
 
-make('p5-canvas', width, height, zoom, makeLogic(ImprovedLogic, Grid));
+make('p5-canvas', 180, 90, makeLogic(ImprovedLogic, Grid));
