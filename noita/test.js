@@ -1,1 +1,1 @@
-make('p5-canvas', 30, 10, makeLogic(ImprovedLogic, Grid), 20);
+makeEnv('p5-canvas', 30, 10, 20, makeLogic(ImprovedLogic, Grid));

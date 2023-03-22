@@ -24,7 +24,7 @@ function before(p) {
 // @height: canvas height
 // @p5WrapperFn: call `p5WrapperFn(p)` within p5 setup
 // @zoom: the true display height/width of each "pixel" on the canvas
-function make(id, width, height, p5WrapperFn, zoom = null, webgl = false) {
+function makeEnv(id, width, height, zoom, p5WrapperFn, webgl = false) {
 
   zoom = zoom ?? (window.innerWidth >= width * 4 ? 4 : 2);
 
