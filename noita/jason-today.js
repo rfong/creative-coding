@@ -18,6 +18,12 @@ function before(p) {
   p.background(p.backgroundColor || window.background);
 }
 
+// makeEnv, but with the grid width/height specified rather than the pixel 
+// width/height
+function makeZoomedEnv(id, width, height, zoom, p5WrapperFn, webgl = false) {
+  makeEnv(id, width*zoom, height*zoom, zoom, p5WrapperFn, webgl);
+}
+
 // Make a new p5 instance with:
 // @id: HTML ID of canvas element to attach to
 // @width: canvas width
@@ -25,8 +31,6 @@ function before(p) {
 // @p5WrapperFn: call `p5WrapperFn(p)` within p5 setup
 // @zoom: the true display height/width of each "pixel" on the canvas
 function makeEnv(id, width, height, zoom, p5WrapperFn, webgl = false) {
-
-  zoom = zoom ?? (window.innerWidth >= width * 4 ? 4 : 2);
 
   return new p5((p) => {
     p.isWEBGL = webgl;
@@ -121,7 +125,7 @@ function makeEnv(id, width, height, zoom, p5WrapperFn, webgl = false) {
       // Zoom canvas
       const canvas = p.createCanvas(width, height, p.isWEBGL ? p.WEBGL : p.P2D);
       p.canvas = canvas;
-      p.setZoom(zoom);
+      //p.setZoom(zoom);
 
       p.background(p.backgroundColor);
       p.setup_(canvas);
@@ -148,6 +152,7 @@ function makeEnv(id, width, height, zoom, p5WrapperFn, webgl = false) {
 
     p.draw = function () {
       (p.before || (() => before(p)))();
+      p.scale(p.zoom*10);
       p.update();
 
       p._postUpdateQueue.forEach((fn) => {
@@ -234,7 +239,7 @@ function makeEnv(id, width, height, zoom, p5WrapperFn, webgl = false) {
     }
 
     p.windowResized = () => {
-      p.setZoom(p.calculateZoom());
+      //p.setZoom(p.calculateZoom());
     };
 
   }, id);
