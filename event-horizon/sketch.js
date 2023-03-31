@@ -1,30 +1,22 @@
 let canvasCenter;
-let ctrlSlider,
+let fitSlider,
     radiusSlider,
     debugCheckbox;
 
 function setup() {
-  createCanvas(400, 400);
+  let canvas = createCanvas(400, 400);
+  canvas.parent("p5-canvas");
   
-  let xPos = 20,
-      yPos = 325;
+  fitSlider = createSlider(0, PI/2, PI/4, PI/180);
+  fitSlider.style('width', '100px');
+  fitSlider.parent(select('#fit-ctrl-container'));
   
-  let label = createDiv('Curve fit');
-  label.position(110+xPos, yPos+height);
-  ctrlSlider = createSlider(0, PI/2, PI/4, PI/180);
-  ctrlSlider.position(xPos, yPos+height);
-  ctrlSlider.style('width', '100px');
-  yPos += 25;
-  
-  label = createDiv('Radius');
-  label.position(110+xPos,yPos+height);
   radiusSlider = createSlider(5, 100, 50);
-  radiusSlider.position(xPos, yPos+height);
   radiusSlider.style('width', '100px');
-  yPos += 25;
+  radiusSlider.parent(select('#radius-ctrl-container'));
   
   debugCheckbox = createCheckbox('DEBUG', true);
-  debugCheckbox.position(xPos, yPos+height);
+  debugCheckbox.parent(select('#debug-ctrl-container'));
 }
 
 function isDebug() { return debugCheckbox.checked(); }
@@ -101,7 +93,7 @@ function warpedLine(y,r) {
   */
   
   // Where do we start to deviate from the orbit?
-  let theta = ctrlSlider.value();
+  let theta = fitSlider.value();
 
   // bottom arc
   arc(0,0,r*2,r*2, -theta+PI/2,theta+PI/2); // theta=0 appears to face right??

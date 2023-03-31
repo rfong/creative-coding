@@ -3,6 +3,7 @@
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../style.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <meta charset="utf-8" />
 
     <script src="sketch.js"></script>
@@ -16,7 +17,17 @@
     <p>idea: a black hole event horizon.</p>
     <p>disclaimer: mathematically, this bears no accurate resemblance to an actual event horizon. I tried to create a "warped" representation of a 2d grid with beziers and ended up getting so frustrated by p5's API that I had to make an entire bezier visualizer just to understand what I was doing.</p>
 
-    <div id="p5-canvas"></div>
+    <div id="p5-container">
+
+      <div id="p5-canvas"></div>
+
+      <div id="controls">
+        <div><span id="fit-ctrl-container"></span> <label>Curve fit</label></div>
+        <div><span id="radius-ctrl-container"></span> <label>Radius</label></div>
+        <div><span id="debug-ctrl-container"></span></div>
+      </div>
+
+    </div>
   	
     <p class="footnote">
       written 2023-03-30 during RC creative coding meetup<br/>
