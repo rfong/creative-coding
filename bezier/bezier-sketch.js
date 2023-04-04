@@ -364,9 +364,9 @@ class CubicBezier {
   }
 }
 
-// Data structure to manage a Bezier curve composed of arbitrarily many
+// Data structure to manage a Bezier shape composed of arbitrarily many
 // Bezier vertices.
-class BezierCurve extends CubicBezier {
+class BezierShape extends CubicBezier {
   // Accepts arguments as:
   // CubicBezier(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y), coordinates
   constructor(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y) {
