@@ -45,6 +45,12 @@ class BezierSketch {
 
   // If undefined, don't change anything (default to current p5 settings)
   styles = {
+    label: {
+      xOff: 8,
+      yOff: 3,
+      fill: [255,255,255],
+      stroke: null,
+    },
     bezierLine: {
       fill: null,  // noFill
     },
@@ -221,6 +227,7 @@ class BezierSketch {
       this.drawPoint(cp1);
       this.drawPoint(cp2);
     });
+
     this.drawEnv('controlLine', function(p) {
       p.line(p1.x,p1.y,cp1.x,cp1.y);
       p.line(p2.x,p2.y,cp2.x,cp2.y);
@@ -232,13 +239,29 @@ class BezierSketch {
     });
     
     if (!this.isDebug()) return;
-    
+
     // Visualize anchor points on top
     this.drawEnv('anchorPoint', function(p) {
       this.drawPoint(p1);
       this.drawPoint(p2);
     });
     
+    // Text labels
+    this.drawEnv('label', function(p) {
+      this.labelPoint(p1, 'p1');
+      this.labelPoint(p2, 'p2');
+      this.labelPoint(cp1, 'cp1');
+      this.labelPoint(cp2, 'cp2');
+    });
+
+  }
+
+  // Helper that draws a label near a point
+  labelPoint(point, label) {
+    const ts = this.styles.label;
+    if (ts) {
+      this.p.text(label, point.x + ts.xOff, point.y + ts.yOff);
+    }
   }
  
   // Helper that adds a `vertex` and accepts 2d vector
@@ -293,7 +316,6 @@ class CubicBezier {
   // Accepts arguments as:
   // CubicBezier(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y), coordinates
   constructor(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y) {
-  //constructor(p1, p2, cp1, cp2) {
     this.p1 = new p5.Vector(p1x, p1y);
     this.p2 = new p5.Vector(p2x, p2y);
     this.cp1 = new p5.Vector(cp1x, cp1y);
@@ -330,33 +352,56 @@ class CubicBezier {
   }
 }
 
+// Data structure to manage a Bezier curve composed of arbitrarily many
+// Bezier vertices.
+class BezierCurve extends CubicBezier {
+  // Accepts arguments as:
+  // CubicBezier(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y), coordinates
+  constructor(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y) {
+    this.pts = [
+      new p5.Vector(p1x, p1y),
+      new p5.Vector(p2x, p2y),
+    ];
+    this.cpts = [
+      new p5.Vector(cp1x, cp1y),
+      new p5.Vector(cp2x, cp2y),
+    ];
+  }
+  
+  // Add a new Bezier vertex by adding one anchor point and two control points.
+  addVertex(pt, cp1, cp2) {
+    this.pts.push(pt);
+    this.cpts.push(cp1);
+    this.cpts.push(cp2);
+  }
+}
+
 // Interactive extension of BezierSketch that tracks a collection of beziers,
 // and allows for click-and-drag modification of beziers.
 class InteractiveBezierSketch extends BezierSketch {
 
   // `bezier` is a CubicBezier instance
-  constructor(htmlElementId, p, bezier, htmlBefore, htmlAfter) {
+  constructor(htmlElementId, p, beziers, htmlBefore, htmlAfter) {
     super(htmlElementId, p,
       // p5 setup function
       function(p) {
         this.setupHandlers(p);
-        /*this.styles.controlPoint = {
-          stroke: [200,0,255],
-          fill: [200,0,255],
-        };*/
       },
       // p5 draw function
       function(p){
         p.background(180,180,255);
-        this.drawBezier(this.bezier.p1, this.bezier.p2, this.bezier.cp1, this.bezier.cp2);
+        // Draw all beziers we are tracking
+        for (const bez of this.beziers) {
+          this.drawBezier(bez.p1, bez.p2, bez.cp1, bez.cp2);
+        }
       },
       htmlBefore, htmlAfter,
     );
-    this.bezier = bezier;
+    this.beziers = beziers;
   }
 
   /* START mouse event handlers */
-  draggedPoint = null;  // name of the point currently being dragged
+  draggedPoint = {};  // track the point currently being dragged
 
   setupHandlers(p) {
     p.onLeftClick = (x,y) => {
@@ -367,20 +412,31 @@ class InteractiveBezierSketch extends BezierSketch {
     p.getMouseY = () => (
       p.isWEBGL ? p.mouseY - p.height / 2 : p.constrain(p.mouseY, 0, p.height - 1));
     p.mouseDragged = () => {
-      // If `draggedPoint` is currently registered, make it follow the mouse.
-      if (this.draggedPoint != null) {
-        this.bezier[this.draggedPoint] = new p5.Vector(p.getMouseX(), p.getMouseY());
+      // If `draggedPointName` is currently registered, make it follow the mouse.
+      const pt = this.draggedPoint;
+      if (pt) {
+        this.beziers[pt.index][pt.name] = new p5.Vector(p.getMouseX(), p.getMouseY());
       }
     }
     p.mousePressed = () => {
-      // If we made contact with a point, register its name to `draggedPoint`
-      this.draggedPoint = (
-        this.bezier.touchesPoint(p.getMouseX(), p.getMouseY(), this.POINT_RADIUS) 
-        ?? null);
+      // If we made contact with a point, register it as being dragged
+      for (let i=0; i<this.beziers.length; i++) {
+        const bez = this.beziers[i];
+        // TODO(rfong): oh no we should actually get the minimum distance over
+        // all beziers in stock? maybe the point radius is too small to be
+        // noticeable
+        const touchedName = bez.touchesPoint(p.getMouseX(), p.getMouseY(), this.POINT_RADIUS);
+        if (touchedName) {
+          this.draggedPoint = {
+            name: touchedName,
+            index: i,
+          };
+        }
+      }
     }
     p.mouseReleased = () => {
-      // Release `draggedPoint`
-      this.draggedPoint = null;
+      // Release dragged point
+      this.draggedPoint = {};
     }
   }
   /* END mouse event handlers */
@@ -392,9 +448,9 @@ class InteractiveBezierSketch extends BezierSketch {
 
 // Factory to create a new interactive bezier sketch.
 // Parameter specifications similar to above.
-function interactiveBezierSketchFactory(htmlElementId, bezier, htmlBefore, htmlAfter) {
+function interactiveBezierSketchFactory(htmlElementId, beziers, htmlBefore, htmlAfter) {
   return new p5((p) => {
-    new InteractiveBezierSketch(htmlElementId, p, bezier, htmlBefore, htmlAfter);
+    new InteractiveBezierSketch(htmlElementId, p, beziers, htmlBefore, htmlAfter);
   });
 };
 
