@@ -48,10 +48,13 @@ class BezierSketch {
     bezierLine: {
       fill: null,  // noFill
     },
-    anchorPoints: {
-      fill: null,  // noFill
+    anchorPoint: {
+      fill: [255,255,255],
     },
-    controlPoints: {
+    controlLine: {
+      stroke: [255,255,255],
+    },
+    controlPoint: {
       fill: [255,255,255],
       stroke: [255,255,255],
     },
@@ -214,11 +217,12 @@ class BezierSketch {
     let p = this.p;
 
     // Visualize control points first (underneath)
-    this.drawEnv('controlPoints', function(p) {
+    this.drawEnv('controlPoint', function(p) {
       this.drawPoint(cp1);
-      p.line(p1.x,p1.y,cp1.x,cp1.y);
-      
       this.drawPoint(cp2);
+    });
+    this.drawEnv('controlLine', function(p) {
+      p.line(p1.x,p1.y,cp1.x,cp1.y);
       p.line(p2.x,p2.y,cp2.x,cp2.y);
     });
     
@@ -230,7 +234,7 @@ class BezierSketch {
     if (!this.isDebug()) return;
     
     // Visualize anchor points on top
-    this.drawEnv('anchorPoints', function(p) {
+    this.drawEnv('anchorPoint', function(p) {
       this.drawPoint(p1);
       this.drawPoint(p2);
     });
@@ -336,10 +340,14 @@ class InteractiveBezierSketch extends BezierSketch {
       // p5 setup function
       function(p) {
         this.setupHandlers(p);
+        /*this.styles.controlPoint = {
+          stroke: [200,0,255],
+          fill: [200,0,255],
+        };*/
       },
       // p5 draw function
       function(p){
-        p.background(255,0,0);
+        p.background(180,180,255);
         this.drawBezier(this.bezier.p1, this.bezier.p2, this.bezier.cp1, this.bezier.cp2);
       },
       htmlBefore, htmlAfter,
