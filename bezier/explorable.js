@@ -1,11 +1,16 @@
 // after importing `bezier-sketch.js`, set up sketches.
 
-interactiveBezierSketchFactory('p5-container', 
+/* ---------------------------------------------------------------------------
+ * section 1
+ */
+
+interactiveBezierSketchFactory('p5-container-1', 
   [new CubicBezier(100,100, 300,300, 100,300, 300,200)],
-  'Below is a single cubic Bezier curve. Click and drag to get a sense for how different configurations of anchor points and control points change the shape.',
+  'Below is a single cubic Bezier curve.',
+  'Drag the points around to get a sense for how different configurations change the shape.<p>You can think of the control points (cp1, cp2) as "pulling" the curve more toward them.</p>',
 );
 
-bezierSketchFactory('p5-container',
+bezierSketchFactory('p5-container-1',
   // p5 setup function
   function(p) {
     this.addControl('p1x', p.createInput(100), 'point1.x');
@@ -27,30 +32,18 @@ bezierSketchFactory('p5-container',
         this.styles.anchorPoint = this.defaultStyles.anchorPoint;
         this.styles.controlPoint = this.defaultStyles.controlPoint;
       } else {
-        this.styles.anchorPoint = this.styles.controlPoint = {
-          fill: null,
-          stroke: null,
-        };
+        this.styles.anchorPoint = this.styles.controlPoint = null;
       }
-      this.styles.controlLine = (
-        this.controls.showTangents.checked() ?
-        this.defaultStyles.controlLine :
-        {
-          fill: null,
-          stroke: null,
-        }
-      );
     });
+    this.styles.controlLine = null;
 
     this.addControl('showPoints', p.createCheckbox('Show points', false), '')
-      .changed(this.updateStyles);
-    this.addControl('showTangents', p.createCheckbox('Show tangents', false), '')
       .changed(this.updateStyles);
     this.updateStyles();
   },
   // p5 draw function
   function(p) {
-    p.background(200,200,200);
+    p.background(180);
 
     // Get coordinates out of inputs and draw the Bezier curve, with no frills.
     const ctrls = this.controls;
@@ -65,14 +58,7 @@ bezierSketchFactory('p5-container',
       new p5.Vector(vals[6], vals[7]),
     );
   },
-  "Beziers are much less intuitive if you're working purely in code! Try making the Bezier curve you want just by typing in coordinates. (The canvas below does not allow clicking and dragging.)",
-);
-
-interactiveBezierSketchFactory('p5-container', 
-  [
-    new CubicBezier(100,100, 300,300, 100,300, 300,200),
-    new CubicBezier(300,200, 300,300, 100,300, 300,300),
-  ],
-  'Below is a single cubic Bezier curve. Click and drag the points to change it.',
+  "Beziers are much more annoying to define if you're a programmer working in code instead of using a nice visual interface! Try it below.",
+  "This canvas does not have mouse interaction implemented. It's a simulation of my deeply frustrating experience figuring out how to build the interface you see on this page!",
 );
 

@@ -18,14 +18,15 @@ class BezierSketch {
       let canvas = p.createCanvas(400, 400);
       canvas.parent(this.htmlContainer);
       // Append empty control panel to end of container
-      this.htmlSelect().child(this.p.createDiv().class('controls'));
+      this.htmlSelect().child(
+        this.p.createDiv().class('controls').style('display', 'none'));
       // Bind and execute additional setup functionality
       setupFn.bind(this, p)();
 
       // After the setup function has executed, add before & after html
       $(this.htmlContainer.elt)
         .prepend('<p>'+(htmlBefore ?? '')+'</p>')
-        .append('<p>'+(htmlAfter ?? '')+'</p>');
+        .append('<div class="caption">'+(htmlAfter ?? '')+'</div>');
     }
 
     // Set `draw` function on p5 instance and bind its scope to `this`
@@ -80,6 +81,10 @@ class BezierSketch {
   // Example usage:
   //  this.drawEnv(this.styles.bezier, function(p) {...});
   drawEnv(settingName, fn) {
+    // If the whole style is null, skip the drawing entirely to save time.
+    if (this.styles[settingName] == null) return;
+
+    // Otherwise, start a new draw state and execute `fn` inside of it.
     const p = this.p;
     p.push(); // start new draw state
     this.fill(this.styles[settingName].fill);
@@ -134,15 +139,18 @@ class BezierSketch {
     // Add to instance dict of controls
     this.controls[id] = ctrlEl;
     // Create html container and add to control panel
-    this.htmlSelect('.controls').child(this.p.createDiv(
-      _.template(`
-        <span class="{{className}}"></span>
-        <label>{{label}}</label>
-      `)({
-        className: className,
-        label: label,
-      })
-    ));
+    this.htmlSelect('.controls')
+      .style('display', 'inline-block')
+      .child(this.p.createDiv(
+        _.template(`
+          <span class="{{className}}"></span>
+          <label>{{label}}</label>
+        `)({
+          className: className,
+          label: label,
+        })
+      )
+    );
     // Set parent as the html container we just created
     ctrlEl.parent(this.htmlSelect('.controls .'+className));
     return ctrlEl;
@@ -248,10 +256,14 @@ class BezierSketch {
     
     // Text labels
     this.drawEnv('label', function(p) {
-      this.labelPoint(p1, 'p1');
-      this.labelPoint(p2, 'p2');
-      this.labelPoint(cp1, 'cp1');
-      this.labelPoint(cp2, 'cp2');
+      if (this.styles.anchorPoint != null) {
+        this.labelPoint(p1, 'p1');
+        this.labelPoint(p2, 'p2');
+      }
+      if (this.styles.controlPoint != null) {
+        this.labelPoint(cp1, 'cp1');
+        this.labelPoint(cp2, 'cp2');
+      }
     });
 
   }
@@ -401,7 +413,7 @@ class InteractiveBezierSketch extends BezierSketch {
   }
 
   /* START mouse event handlers */
-  draggedPoint = {};  // track the point currently being dragged
+  draggedPoint = null;  // track the point currently being dragged
 
   setupHandlers(p) {
     p.onLeftClick = (x,y) => {
@@ -436,7 +448,7 @@ class InteractiveBezierSketch extends BezierSketch {
     }
     p.mouseReleased = () => {
       // Release dragged point
-      this.draggedPoint = {};
+      this.draggedPoint = null;
     }
   }
   /* END mouse event handlers */

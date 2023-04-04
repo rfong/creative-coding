@@ -1,7 +1,33 @@
+h1,h2,h3 {
+  margin-top: 2em;
+}
+
 .p5 {
   margin-bottom: 2em;
+  width: 100%;
+  float: left;
+}
+
+/* clearfix */
+.p5::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* allow things to wrap around the canvas */
+.p5 canvas {
+  float: left;
+  margin-bottom: 0.5em;
+  margin-right: 2em;
+}
+
+.p5 .caption, .p5 .controls {
+  display: inline-block;
+  width: 400px;
+  margin-top: 0;
 }
 
 .p5 .controls {
-  margin-top: 0.5em;
+  margin-bottom: 1em;
 }

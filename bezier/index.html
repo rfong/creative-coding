@@ -18,11 +18,11 @@
   <body>
 		<a href="../"><< back</a>
 
-    <h1>bezier</h1>
+    <h1>Bezier curves</h1>
     <p>Bezier curves are often used in computer graphics & design to define smooth curves.</p>
 
-    <p>Have you ever wondered why digital fonts can be resized to arbitrarily large sizes and they still look good and smooth? Digital fonts aren't images. They don't have resolution issues because they are defined using Bezier curves.</p>
-    <p>As the font changes size, the shapes you see are re-interpolated based on the position of the points defining the Bezier curves. So you have secretly seen thousands of very tiny Bezier curves every time you look at a web browser.</p>
+    <p>Have you ever wondered why digital fonts can be resized to arbitrarily large sizes and they still look good and smooth?</p>
+    <p>Digital fonts aren't images. They don't have resolution issues because they are defined using Bezier curves. As the font changes size, the shapes you see are re-interpolated based on the position of the points defining the Bezier curves. So you have secretly seen thousands of very tiny Bezier curves every time you look at a web browser.</p>
 
     <p>
       <img src="images/jdhao_example_e.png" height=180 />
@@ -31,8 +31,21 @@
     </p>
     <p class="caption">images via <a href="https://jdhao.github.io/2018/11/27/font_shape_mathematics_bezier_curves/">"The Mathematics behind Font Shapes --- Bézier Curves and More" - jdhao.github.io</a></p>
 
-    <div id="p5-container"></div>
+    <p>A Bezier curve is a <b>polynomial curve</b>. For example:</p>
+    <ul>
+      <li>Linear Bezier curves (order <code>x</code>) are just straight lines.</li>
+      <li>Quadratic Bezier curves (order <code>x^2</code>) are parabolas.</li>
+      <li>Cubic Bezier curves (order <code>x^3</code>) are more useful for vector art, so these are the kind you've probably seen the most.</li>
+    </ul>
 
+    <p>However, the user defines them in terms of "anchor points" and "control points" rather than as a polynomial equation <code>d*x^3 + c*x^2 + b*x + a</code>.
+
+    <h2>Explore a cubic Bezier curve</h2>
+    <div id="p5-container-1"></div>
+
+    <div id="p5-container-2"></div>
+
+    <hr/>
     <p class="footnote">
       drafted 2023-04-03 as a followup exercise from <a href="../event-horizon">event-horizon</a>
     </p>
