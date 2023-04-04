@@ -156,6 +156,7 @@ class BezierSketch {
     return ctrlEl;
   }
 
+
   /* -------------------------------------------------------------------------
    * Convenience functions for math & drawing
    */
@@ -225,6 +226,72 @@ class BezierSketch {
     );
   }
 
+  // unpack p5.Vector coordinates into an array of numbers.
+  unpackPoints(points) {
+    const coords = [];
+    for (const pt of points) {
+      coords.push(pt.x);
+      coords.push(pt.y);
+    }
+    return coords;
+  }
+
+  drawBezierShape(pts, cpts) {
+    let p = this.p;
+
+    // Draw control points first (underneath)
+    this.drawEnv('controlPoint', function(p) {
+      for (const cp of cpts)
+        this.drawPoint(cp);
+    });
+
+    // Draw control lines
+    this.drawEnv('controlLine', function(p) {
+      // draw first and last control lines
+      this.drawLine(pts[0], cpts[0]);
+      this.drawLine(pts[pts.length-1], cpts[cpts.length-1]);
+      // all the middle anchor points have two control lines each
+      for (let i=1; i<pts.length-1; i++) {
+        this.drawLine(pts[i], cpts[2*i-1]);
+        this.drawLine(pts[i], cpts[2*i]);
+      }
+    });
+
+    // Draw bezier line on top
+    this.drawEnv('bezierLine', function(p) {
+      p.beginShape();
+      // Set first anchor point
+      p.vertex(pts[0].x, pts[0].y);
+      // For remaining anchor points, use `bezierVertex`
+      for (let i=1; i<pts.length; i++) {
+        p.bezierVertex.apply(p, this.unpackPoints([
+          cpts[2*(i-1)],
+          cpts[2*(i-1)+1],
+          pts[i],
+        ]));
+      }
+      p.endShape();
+    });
+
+    // Draw anchor points on top of line
+    this.drawEnv('anchorPoint', function(p) {
+      for (const pt of pts)
+        this.drawPoint(pt);
+    });
+    
+    // Text labels
+    this.drawEnv('label', function(p) {
+      if (this.styles.anchorPoint != null) {
+        for (let i in pts) 
+          this.labelPoint(pts[i], 'p'+i);
+      }
+      if (this.styles.controlPoint != null) {
+        for (let i in cpts) 
+          this.labelPoint(cpts[i], 'cp'+i);
+      }
+    });
+  }
+
   // Helper that draws a cubic Bezier with helper visualizations.
   // All arguments are p5.Vector instances.
   drawBezier(p1,p2, cp1,cp2) {
@@ -248,7 +315,7 @@ class BezierSketch {
     
     if (!this.isDebug()) return;
 
-    // Visualize anchor points on top
+    // Draw anchor points on top of line
     this.drawEnv('anchorPoint', function(p) {
       this.drawPoint(p1);
       this.drawPoint(p2);
@@ -290,6 +357,11 @@ class BezierSketch {
   drawPoint(point) {
     this.p.circle(point.x,point.y, this.POINT_RADIUS);
   }
+
+  // Draw a line between two points
+  drawLine(pt1, pt2) {
+    this.p.line(pt1.x, pt1.y, pt2.x, pt2.y);
+  }
   
   // theta=0 points down
   getPointOnCircle(r, theta) {
@@ -323,31 +395,57 @@ function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlAft
  * START interactive extension
  */
 
-// Data structure to manage a cubic Bezier curve.
-class CubicBezier {
-  // Accepts arguments as:
-  // CubicBezier(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y), coordinates
-  constructor(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y) {
-    this.p1 = new p5.Vector(p1x, p1y);
-    this.p2 = new p5.Vector(p2x, p2y);
-    this.cp1 = new p5.Vector(cp1x, cp1y);
-    this.cp2 = new p5.Vector(cp2x, cp2y);
+// Data structure to manage a Bezier shape composed of arbitrarily many
+// Bezier vertices.
+class BezierShape {
+  // `points` and `controlPoints` are nested arrays of (x,y) coords.
+  constructor(pts, cpts) {
+    this.pts = _.map(pts, (pt) => { return new p5.Vector(pt[0], pt[1]) });
+    this.cpts = _.map(cpts, (pt) => { return new p5.Vector(pt[0], pt[1]) });
   }
 
-  getPointNames() { return ['p1', 'p2', 'cp1', 'cp2']; }
-  getPoints() { return [this.p1, this.p2, this.cp1, this.cp2]; }
+  // Returns the ith anchor point, or undefined if it's out of range
+  getAnchorPoint(i) { return this.pts[i]; }
+  // Returns the ith control point, or undefined if it's out of range
+  getControlPoint(i) { return this.cpts[i]; }
+
+  // Sets a point given a name denoting either an anchor or control point,
+  // e.g. 'p1' or 'cp2'.
+  // Return true if success, false if the point did not exist.
+  pointNameRe = new RegExp("^(c?)p([0-9]+)$");
+  setPoint(name, val) {
+    const matches = name.match(this.pointNameRe);
+    if (!matches) return false;
+    const ind = parseInt(matches[2]);
+    if (matches[1] == "c") {
+      if (ind >= this.cpts.length) return false;
+      this.cpts[ind] = val;
+      return true;
+    }
+    if (ind >= this.pts.length) return false;
+    this.pts[ind] = val;
+    return true;
+  }
+
+  // Add a new Bezier vertex by adding one anchor point and two control points.
+  addVertex(pt, cp1, cp2) {
+    this.pts.push(pt);
+    this.cpts.push(cp1);
+    this.cpts.push(cp2);
+  }
 
   // If (x,y) touches one of our points, return <string> name of the instance
   // attribute describing the closest point it touches.
+  // 'p1' describes anchor point 1, 'cp1' describes control point 1, etc.
   // Because the points are rendered as circles, need to check if <x,y> is
   // within any of the possible circles of radius `radius`.
   // If no points are touching, return `false`.
-  touchesPoint(x,y, radius) {
+  touchesPoint(x, y, radius) {
     let minDist = undefined,
         minInd = undefined,
         i = 0;
-    // Loop through our points and capture the smallest distance
-    for (const point of this.getPoints()) {
+    // Loop through all points and capture the smallest distance
+    for (const point of this.pts.concat(this.cpts)) {
       const d = point.dist(new p5.Vector(x,y));
       if (minDist == undefined || d < minDist) {
         minDist = d;
@@ -357,34 +455,11 @@ class CubicBezier {
     }
     // If within `radius` of <x,y>, return the name of the closest point.
     if (minDist <= radius) {
-      return this.getPointNames()[minInd];
+      if (minInd < this.pts.length) { return "p"+minInd; }
+      return "cp"+(minInd-this.pts.length);
     }
     // If nothing met the criteria, return `false`.
     return false;
-  }
-}
-
-// Data structure to manage a Bezier shape composed of arbitrarily many
-// Bezier vertices.
-class BezierShape extends CubicBezier {
-  // Accepts arguments as:
-  // CubicBezier(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y), coordinates
-  constructor(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y) {
-    this.pts = [
-      new p5.Vector(p1x, p1y),
-      new p5.Vector(p2x, p2y),
-    ];
-    this.cpts = [
-      new p5.Vector(cp1x, cp1y),
-      new p5.Vector(cp2x, cp2y),
-    ];
-  }
-  
-  // Add a new Bezier vertex by adding one anchor point and two control points.
-  addVertex(pt, cp1, cp2) {
-    this.pts.push(pt);
-    this.cpts.push(cp1);
-    this.cpts.push(cp2);
   }
 }
 
@@ -392,7 +467,7 @@ class BezierShape extends CubicBezier {
 // and allows for click-and-drag modification of beziers.
 class InteractiveBezierSketch extends BezierSketch {
 
-  // `bezier` is a CubicBezier instance
+  // `bezier` is a BezierShape instance
   constructor(htmlElementId, p, beziers, htmlBefore, htmlAfter) {
     super(htmlElementId, p,
       // p5 setup function
@@ -404,7 +479,7 @@ class InteractiveBezierSketch extends BezierSketch {
         p.background(180,180,255);
         // Draw all beziers we are tracking
         for (const bez of this.beziers) {
-          this.drawBezier(bez.p1, bez.p2, bez.cp1, bez.cp2);
+          this.drawBezierShape(bez.pts, bez.cpts);
         }
       },
       htmlBefore, htmlAfter,
@@ -416,9 +491,6 @@ class InteractiveBezierSketch extends BezierSketch {
   draggedPoint = null;  // track the point currently being dragged
 
   setupHandlers(p) {
-    p.onLeftClick = (x,y) => {
-      console.log("click", x, y);
-    }
     p.getMouseX = () => (
       p.isWEBGL ? p.mouseX - p.width / 2 : p.constrain(p.mouseX, 0, p.width - 1));
     p.getMouseY = () => (
@@ -427,7 +499,10 @@ class InteractiveBezierSketch extends BezierSketch {
       // If `draggedPointName` is currently registered, make it follow the mouse.
       const pt = this.draggedPoint;
       if (pt) {
-        this.beziers[pt.index][pt.name] = new p5.Vector(p.getMouseX(), p.getMouseY());
+        this.beziers[pt.bezIndex].setPoint(
+          pt.pointName,
+          new p5.Vector(p.getMouseX(), p.getMouseY())
+        );
       }
     }
     p.mousePressed = () => {
@@ -440,8 +515,8 @@ class InteractiveBezierSketch extends BezierSketch {
         const touchedName = bez.touchesPoint(p.getMouseX(), p.getMouseY(), this.POINT_RADIUS);
         if (touchedName) {
           this.draggedPoint = {
-            name: touchedName,
-            index: i,
+            pointName: touchedName,
+            bezIndex: i,
           };
         }
       }

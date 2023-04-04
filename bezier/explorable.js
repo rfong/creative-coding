@@ -5,9 +5,20 @@
  */
 
 interactiveBezierSketchFactory('p5-container-1', 
-  [new CubicBezier(100,100, 300,300, 100,300, 300,200)],
-  'Below is a single cubic Bezier curve.',
-  'Drag the points around to get a sense for how different configurations change the shape.<p>The <b>"anchor points" (p1 and p2)</b> are the endpoints that the curved line must pass through.</p><p>You can think of the <b>"control points" (cp1 and cp2)</b> as "pulling" the curve more toward them.</p>',
+  [
+    new BezierShape(
+      [[100,100], [300,300]],
+      [[100,300], [300,200]],
+    ),
+  ],
+  // preface
+  `Below is a single cubic Bezier curve.`,
+  // caption
+  `
+  Drag the points around to get a sense for how different configurations change the shape.
+  <p>The <b>"anchor points" (p1 and p2)</b> are the endpoints that the curved line must pass through.</p>
+  <p>You can think of the <b>"control points" (cp1 and cp2)</b> as "pulling" the curve more toward them.</p>
+  `,
 );
 
 bezierSketchFactory('p5-container-1',
@@ -58,7 +69,29 @@ bezierSketchFactory('p5-container-1',
       new p5.Vector(vals[6], vals[7]),
     );
   },
+  // preface
   "B-curves are much more annoying to define if you're a programmer working in code instead of using a nice visual interface! Try it below.",
+  // caption
   "This canvas does not have mouse interaction implemented. It's a simulation of my deeply frustrating experience figuring out how to build the interface you see on this page!",
+);
+
+/* ---------------------------------------------------------------------------
+ * section 2
+ */
+
+interactiveBezierSketchFactory('p5-container-2',
+  [
+    new BezierShape(
+      [[50,50], [200,200], [350,350]],
+      [[50,200], [200,100], [200,300], [350,250]],
+    ),
+  ],
+  // preface
+  `What if we stuck together multiple cubic Beziers to make a more complex contour?`, 
+  // caption
+  `
+    Move the points around and try to make an elegant new shape.
+    <p>You might notice that it\'s hard to move p1 without compromising the smoothness of the curve.</p>
+  `,
 );
 
