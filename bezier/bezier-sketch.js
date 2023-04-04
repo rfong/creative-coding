@@ -270,6 +270,16 @@ class BezierSketch {
  * END BezierSketch class
  */
 
+// Factory to create a new bezier sketch attached to `htmlElementId` container.
+// `setupFn` and `drawFn` both take a p5 instance as their only parameter.
+// `htmlAfter` and `htmlBefore` take paragraph content to prepend and append to 
+//   the container, respectively.
+function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlAfter) {
+  return new p5((p) => {
+    new BezierSketch(htmlElementId, p, setupFn, drawFn, htmlBefore, htmlAfter);
+  });
+};
+
 /* ---------------------------------------------------------------------------
  * START interactive extension
  */
@@ -367,4 +377,16 @@ class InteractiveBezierSketch extends BezierSketch {
   }
   /* END mouse event handlers */
 }
+
+/* ---------------------------------------------------------------------------
+ * START interactive extension
+ */
+
+// Factory to create a new interactive bezier sketch.
+// Parameter specifications similar to above.
+function interactiveBezierSketchFactory(htmlElementId, bezier, htmlBefore, htmlAfter) {
+  return new p5((p) => {
+    new InteractiveBezierSketch(htmlElementId, p, bezier, htmlBefore, htmlAfter);
+  });
+};
 
