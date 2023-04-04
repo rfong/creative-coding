@@ -39,6 +39,8 @@ class BezierSketch {
    * p5 style management helpers
    */
 
+  POINT_RADIUS = 5;
+
   // If undefined, don't change anything (default to current p5 settings)
   styles = {
     bezierLine: {
@@ -46,12 +48,10 @@ class BezierSketch {
     },
     anchorPoints: {
       fill: null,  // noFill
-      radius: 5,
     },
     controlPoints: {
       fill: [255,255,255],
       stroke: [255,255,255],
-      radius: 5,
     },
   };
 
@@ -245,8 +245,8 @@ class BezierSketch {
   }
   
   // Draw a small-radius circle at the given point
-  drawPoint(point, radius) {
-    this.p.circle(point.x,point.y,radius ?? 5);
+  drawPoint(point) {
+    this.p.circle(point.x,point.y, this.POINT_RADIUS);
   }
   
   // theta=0 points down
@@ -278,15 +278,6 @@ class BezierSketch {
 function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlAfter) {
   return new p5((p) => {
     new BezierSketch(htmlElementId, p, setupFn, drawFn, htmlBefore, htmlAfter);
-  });
-};
-
-// Factory to create a new interactive bezier sketch.
-// Parameter specifications similar to above.
-function interactiveBezierSketchFactory(htmlElementId, bezier, htmlBefore, htmlAfter) {
-  return new p5((p) => {
-    console.log("interactive factory");
-    new InteractiveBezierSketch(htmlElementId, p, bezier, htmlBefore, htmlAfter);
   });
 };
 
@@ -372,7 +363,7 @@ bezierSketchFactory('p5-canvas-2',
  * START interactive extension
  */
 
-// Data structure to store coordinates for a cubic Bezier curve.
+// Data structure to manage a cubic Bezier curve.
 class CubicBezier {
   // Accepts arguments as:
   // CubicBezier(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y), coordinates
@@ -383,6 +374,35 @@ class CubicBezier {
     this.cp1 = new p5.Vector(cp1x, cp1y);
     this.cp2 = new p5.Vector(cp2x, cp2y);
   }
+
+  getPointNames() { return ['p1', 'p2', 'cp1', 'cp2']; }
+  getPoints() { return [this.p1, this.p2, this.cp1, this.cp2]; }
+
+  // If (x,y) touches one of our points, return <string> name of the instance
+  // attribute describing the closest point it touches.
+  // Because the points are rendered as circles, need to check if <x,y> is
+  // within any of the possible circles of radius `radius`.
+  // If no points are touching, return `false`.
+  touchesPoint(x,y, radius) {
+    let minDist = undefined,
+        minInd = undefined,
+        i = 0;
+    // Loop through our points and capture the smallest distance
+    for (const point of this.getPoints()) {
+      const d = point.dist(new p5.Vector(x,y));
+      if (minDist == undefined || d < minDist) {
+        minDist = d;
+        minInd = i;
+      }
+      i++;
+    }
+    // If within `radius` of <x,y>, return the name of the closest point.
+    if (minDist <= radius) {
+      return this.getPointNames()[minInd];
+    }
+    // If nothing met the criteria, return `false`.
+    return false;
+  }
 }
 
 // Interactive extension of BezierSketch that WILL ALLOW click-and-drag 
@@ -390,7 +410,7 @@ class CubicBezier {
 class InteractiveBezierSketch extends BezierSketch {
 
   // `bezier` is a CubicBezier instance
-  constructor(htmlElementId, p, bezier) {
+  constructor(htmlElementId, p, bezier, htmlBefore, htmlAfter) {
     super(htmlElementId, p,
       // p5 setup function
       function(p) {
@@ -400,12 +420,15 @@ class InteractiveBezierSketch extends BezierSketch {
       function(p){
         p.background(255,0,0);
         this.drawBezier(this.bezier.p1, this.bezier.p2, this.bezier.cp1, this.bezier.cp2);
-      }
+      },
+      htmlBefore, htmlAfter,
     );
     this.bezier = bezier;
   }
 
   /* START mouse event handlers */
+  draggedPoint = null;  // name of the point currently being dragged
+
   setupHandlers(p) {
     p.onLeftClick = (x,y) => {
       console.log("click", x, y);
@@ -415,14 +438,32 @@ class InteractiveBezierSketch extends BezierSketch {
     p.getMouseY = () => (
       p.isWEBGL ? p.mouseY - p.height / 2 : p.constrain(p.mouseY, 0, p.height - 1));
     p.mouseDragged = () => {
-      console.log("drag", p.getMouseX(), p.getMouseY());
+      // If `draggedPoint` is currently registered, make it follow the mouse.
+      if (this.draggedPoint != null) {
+        this.bezier[this.draggedPoint] = new p5.Vector(p.getMouseX(), p.getMouseY());
+      }
     }
     p.mousePressed = () => {
-      console.log("pressed", p.getMouseX(), p.getMouseY());
+      // If we made contact with a point, register its name to `draggedPoint`
+      this.draggedPoint = (
+        this.bezier.touchesPoint(p.getMouseX(), p.getMouseY(), this.POINT_RADIUS) 
+        ?? null);
+    }
+    p.mouseReleased = () => {
+      // Release `draggedPoint`
+      this.draggedPoint = null;
     }
   }
   /* END mouse event handlers */
 }
+
+// Factory to create a new interactive bezier sketch.
+// Parameter specifications similar to above.
+function interactiveBezierSketchFactory(htmlElementId, bezier, htmlBefore, htmlAfter) {
+  return new p5((p) => {
+    new InteractiveBezierSketch(htmlElementId, p, bezier, htmlBefore, htmlAfter);
+  });
+};
 
 /* ---------------------------------------------------------------------------
  * START test interactive extension
@@ -431,4 +472,5 @@ class InteractiveBezierSketch extends BezierSketch {
 // Canvas 3
 interactiveBezierSketchFactory('p5-canvas-3', 
   new CubicBezier(100,100, 200,200, 100,150, 150,100),
+  'Click and drag the points to manipulate the Bezier curve.'
 );
