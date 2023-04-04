@@ -1,8 +1,8 @@
 // after importing `bezier-sketch.js`, set up sketches.
 
 interactiveBezierSketchFactory('p5-container', 
-  new CubicBezier(100,100, 300,300, 100,300, 300,200),
-  'Below is a single cubic Bezier curve. Click and drag the points to change it.',
+  [new CubicBezier(100,100, 300,300, 100,300, 300,200)],
+  'Below is a single cubic Bezier curve. Click and drag to get a sense for how different configurations of anchor points and control points change the shape.',
 );
 
 bezierSketchFactory('p5-container',
@@ -66,5 +66,13 @@ bezierSketchFactory('p5-container',
     );
   },
   "Beziers are much less intuitive if you're working purely in code! Try making the Bezier curve you want just by typing in coordinates. (The canvas below does not allow clicking and dragging.)",
+);
+
+interactiveBezierSketchFactory('p5-container', 
+  [
+    new CubicBezier(100,100, 300,300, 100,300, 300,200),
+    new CubicBezier(300,200, 300,300, 100,300, 300,300),
+  ],
+  'Below is a single cubic Bezier curve. Click and drag the points to change it.',
 );
 

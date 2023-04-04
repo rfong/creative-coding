@@ -19,7 +19,17 @@
 		<a href="../"><< back</a>
 
     <h1>bezier</h1>
-    <p>Bezier curves feel more intuitive when you have an interactive visual UI that lets you smoothly drag the anchor points and control points around to get a sense of their behavior in different configurations.</p>
+    <p>Bezier curves are often used in computer graphics & design to define smooth curves.</p>
+
+    <p>Have you ever wondered why digital fonts can be resized to arbitrarily large sizes and they still look good and smooth? Digital fonts aren't images. They don't have resolution issues because they are defined using Bezier curves.</p>
+    <p>As the font changes size, the shapes you see are re-interpolated based on the position of the points defining the Bezier curves. So you have secretly seen thousands of very tiny Bezier curves every time you look at a web browser.</p>
+
+    <p>
+      <img src="images/jdhao_example_e.png" height=180 />
+      <img src="images/jdhao_example_chinese1.png" height=180 />
+      <img src="images/jdhao_example_chinese2.png" height=180 />
+    </p>
+    <p class="caption">images via <a href="https://jdhao.github.io/2018/11/27/font_shape_mathematics_bezier_curves/">"The Mathematics behind Font Shapes --- Bézier Curves and More" - jdhao.github.io</a></p>
 
     <div id="p5-container"></div>
 

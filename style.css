@@ -13,3 +13,9 @@ canvas {
 .footnote {
   font-style: italic;
 }
+
+.caption, .caption a {
+  color: #777;
+  font-style: italic;
+  width: 100%;
+}
