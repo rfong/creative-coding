@@ -5,23 +5,25 @@ _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 /* p5 instance wrapper with bezier convenience functionality */
 class BezierSketch {
 
-  constructor(htmlElementId, p, setupFn, drawFn, htmlBefore, htmlAfter) {
+  constructor(htmlParentId, p, setupFn, drawFn, htmlBefore, htmlAfter) {
     this.p = p;
-    this.htmlElementId = htmlElementId;
+    this.htmlParentId = htmlParentId;
     this.controls = {};
 
     // Set `setup` function on p5 instance and bind its scope to `this`
     p.setup = () => {
-      // Set up canvas and bind to specified element
+      // Append a new container to the parent.
+      this.htmlContainer = p.createDiv().class('p5').parent(htmlParentId);
+      // Set up canvas and bind to container
       let canvas = p.createCanvas(400, 400);
-      canvas.parent(htmlElementId);
+      canvas.parent(this.htmlContainer);
       // Append empty control panel to end of container
       this.htmlSelect().child(this.p.createDiv().class('controls'));
       // Bind and execute additional setup functionality
       setupFn.bind(this, p)();
 
       // After the setup function has executed, add before & after html
-      $('#'+htmlElementId)
+      $(this.htmlContainer.elt)
         .prepend('<p>'+(htmlBefore ?? '')+'</p>')
         .append('<p>'+(htmlAfter ?? '')+'</p>');
     }
@@ -111,9 +113,10 @@ class BezierSketch {
 
   // Select first match within the html container bound to this instance
   htmlSelect(id) {
-    return this.p.select(
-      '#'+this.htmlElementId + (id===undefined ? '' : ' ' + id)
-    );
+    if (id==undefined) {
+      return this.htmlContainer;
+    }
+    return this.p.select(id, this.htmlContainer);
   }
 
   // Add a p5.Element `input` of some kind to the control panel
@@ -268,10 +271,6 @@ class BezierSketch {
  */
 
 /* ---------------------------------------------------------------------------
- * START set up test visualization
- */
-
-/* ---------------------------------------------------------------------------
  * START interactive extension
  */
 
@@ -317,8 +316,8 @@ class CubicBezier {
   }
 }
 
-// Interactive extension of BezierSketch that WILL ALLOW click-and-drag 
-// modification of beziers.
+// Interactive extension of BezierSketch that tracks a collection of beziers,
+// and allows for click-and-drag modification of beziers.
 class InteractiveBezierSketch extends BezierSketch {
 
   // `bezier` is a CubicBezier instance

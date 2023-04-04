@@ -12,8 +12,7 @@ function interactiveBezierSketchFactory(htmlElementId, bezier, htmlBefore, htmlA
  * START test interactive extension
  */
 
-// Canvas 3
-interactiveBezierSketchFactory('p5-canvas-3', 
+interactiveBezierSketchFactory('p5-container', 
   new CubicBezier(100,100, 200,200, 100,150, 150,100),
   'Click and drag the points to manipulate the Bezier curve.'
 );
