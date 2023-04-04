@@ -5,7 +5,7 @@ _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 /* p5 instance wrapper with bezier convenience functionality */
 class BezierSketch {
 
-  constructor(htmlElementId, p, setupFn, drawFn) {
+  constructor(htmlElementId, p, setupFn, drawFn, htmlBefore, htmlAfter) {
     this.p = p;
     this.htmlElementId = htmlElementId;
     this.controls = {};
@@ -19,6 +19,11 @@ class BezierSketch {
       this.htmlSelect().child(this.p.createDiv().class('controls'));
       // Bind and execute additional setup functionality
       setupFn.bind(this, p)();
+
+      // After the setup function has executed, add before & after html
+      $('#'+htmlElementId)
+        .prepend('<p>'+(htmlBefore ?? '')+'</p>')
+        .append('<p>'+(htmlAfter ?? '')+'</p>');
     }
 
     // Set `draw` function on p5 instance and bind its scope to `this`
@@ -31,40 +36,43 @@ class BezierSketch {
   }
 
   /* -------------------------------------------------------------------------
-   * p5 color management helpers
+   * p5 style management helpers
    */
 
-  // If undefined, don't change anything (default to current p5 color settings)
-  colors = {
+  // If undefined, don't change anything (default to current p5 settings)
+  styles = {
     bezierLine: {
       fill: null,  // noFill
     },
     anchorPoints: {
       fill: null,  // noFill
+      radius: 5,
     },
     controlPoints: {
       fill: [255,255,255],
       stroke: [255,255,255],
+      radius: 5,
     },
   };
 
-  setColors(colorSettingName, fill, stroke) {
-    this.colors[colorSettingName] = {
+  setStyles(settingName, fill, stroke, radius) {
+    this.styles[settingName] = {
       fill: fill,
       stroke: stroke,
+      radius: radius,
     };
   }
 
-  // Run `fn` within a draw state specified in `colors`.
+  // Run `fn` within a draw state specified in `styles`.
   // `fn`: a function that takes a p5 instance as its only argument.
-  // `colorSettingName`: string specifying a top-level key within `this.colors`
+  // `settingName`: string specifying a top-level key within `this.styles`
   // Example usage:
-  //  this.drawEnv(this.colors.bezier, function(p) {...});
-  drawEnv(colorSettingName, fn) {
+  //  this.drawEnv(this.styles.bezier, function(p) {...});
+  drawEnv(settingName, fn) {
     const p = this.p;
     p.push(); // start new draw state
-    this.fill(this.colors[colorSettingName].fill);
-    this.stroke(this.colors[colorSettingName].stroke);
+    this.fill(this.styles[settingName].fill);
+    this.stroke(this.styles[settingName].stroke);
 
     fn.bind(this, p)();  // Run `fn`, letting it know about `this` and `p`
 
@@ -197,7 +205,8 @@ class BezierSketch {
     );
   }
 
-  // Helper that draws a cubic Bezier and accepts 2d vectors
+  // Helper that draws a cubic Bezier with helper visualizations.
+  // All arguments are p5.Vector instances.
   drawBezier(p1,p2, cp1,cp2) {
     let p = this.p;
 
@@ -236,8 +245,8 @@ class BezierSketch {
   }
   
   // Draw a small-radius circle at the given point
-  drawPoint(point) {
-    this.p.circle(point.x,point.y,5);
+  drawPoint(point, radius) {
+    this.p.circle(point.x,point.y,radius ?? 5);
   }
   
   // theta=0 points down
@@ -258,20 +267,26 @@ class BezierSketch {
  * END BezierSketch class
  */
 
+/* ---------------------------------------------------------------------------
+ * START set up test visualization
+ */
+
 // Factory to create a new bezier sketch attached to `htmlElementId` container.
 // `setupFn` and `drawFn` both take a p5 instance as their only parameter.
 // `htmlAfter` and `htmlBefore` take paragraph content to prepend and append to 
 //   the container, respectively.
 function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlAfter) {
   return new p5((p) => {
-    function wrappedSetupFn(p) {
-      setupFn.bind(this, p)();
-      // After the setup function has executed, add before & after html
-      $('#'+htmlElementId)
-        .prepend('<p>'+(htmlBefore ?? '')+'</p>')
-        .append('<p>'+(htmlAfter ?? '')+'</p>');
-    }
-    let sketch = new BezierSketch(htmlElementId, p, wrappedSetupFn, drawFn);
+    new BezierSketch(htmlElementId, p, setupFn, drawFn, htmlBefore, htmlAfter);
+  });
+};
+
+// Factory to create a new interactive bezier sketch.
+// Parameter specifications similar to above.
+function interactiveBezierSketchFactory(htmlElementId, bezier, htmlBefore, htmlAfter) {
+  return new p5((p) => {
+    console.log("interactive factory");
+    new InteractiveBezierSketch(htmlElementId, p, bezier, htmlBefore, htmlAfter);
   });
 };
 
@@ -336,11 +351,13 @@ bezierSketchFactory('p5-canvas-2',
   function(p) {
     p.background(255,0,0);
 
-    p.stroke(0,0,255);
-    this.setColors('controlPoints', [0,255,0], [0,255,0]);
+    p.stroke(0,0,255);  // Set line stroke
+    this.setStyles('controlPoints', [0,255,0], [0,255,0]);
     this.drawBezier(
+      // anchor points
       new p5.Vector(100,100),
       new p5.Vector(200,200),
+      // control points
       new p5.Vector(100,150),
       new p5.Vector(150,100),
     );
@@ -349,4 +366,69 @@ bezierSketchFactory('p5-canvas-2',
   `before`,
   // html after
   `after`,
+);
+
+/* ---------------------------------------------------------------------------
+ * START interactive extension
+ */
+
+// Data structure to store coordinates for a cubic Bezier curve.
+class CubicBezier {
+  // Accepts arguments as:
+  // CubicBezier(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y), coordinates
+  constructor(p1x, p1y, p2x, p2y, cp1x, cp1y, cp2x, cp2y) {
+  //constructor(p1, p2, cp1, cp2) {
+    this.p1 = new p5.Vector(p1x, p1y);
+    this.p2 = new p5.Vector(p2x, p2y);
+    this.cp1 = new p5.Vector(cp1x, cp1y);
+    this.cp2 = new p5.Vector(cp2x, cp2y);
+  }
+}
+
+// Interactive extension of BezierSketch that WILL ALLOW click-and-drag 
+// modification of beziers.
+class InteractiveBezierSketch extends BezierSketch {
+
+  // `bezier` is a CubicBezier instance
+  constructor(htmlElementId, p, bezier) {
+    super(htmlElementId, p,
+      // p5 setup function
+      function(p) {
+        this.setupHandlers(p);
+      },
+      // p5 draw function
+      function(p){
+        p.background(255,0,0);
+        this.drawBezier(this.bezier.p1, this.bezier.p2, this.bezier.cp1, this.bezier.cp2);
+      }
+    );
+    this.bezier = bezier;
+  }
+
+  /* START mouse event handlers */
+  setupHandlers(p) {
+    p.onLeftClick = (x,y) => {
+      console.log("click", x, y);
+    }
+    p.getMouseX = () => (
+      p.isWEBGL ? p.mouseX - p.width / 2 : p.constrain(p.mouseX, 0, p.width - 1));
+    p.getMouseY = () => (
+      p.isWEBGL ? p.mouseY - p.height / 2 : p.constrain(p.mouseY, 0, p.height - 1));
+    p.mouseDragged = () => {
+      console.log("drag", p.getMouseX(), p.getMouseY());
+    }
+    p.mousePressed = () => {
+      console.log("pressed", p.getMouseX(), p.getMouseY());
+    }
+  }
+  /* END mouse event handlers */
+}
+
+/* ---------------------------------------------------------------------------
+ * START test interactive extension
+ */
+
+// Canvas 3
+interactiveBezierSketchFactory('p5-canvas-3', 
+  new CubicBezier(100,100, 200,200, 100,150, 150,100),
 );
