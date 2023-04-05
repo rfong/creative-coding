@@ -156,7 +156,7 @@ p5SketchFactory('InteractiveBezierSketch', 'p5-container-2',
     new BezierShape(
       [[50,50], [200,200], [350,350]],
       // Rotate the central control handle to illustrate the difference
-      [[50,200], [250,100], [150,300], [350,250]],
+      [[50,200], [350,50], [150,250], [350,250]],
       {isSmooth: true},
     ),
   ],
