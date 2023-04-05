@@ -3,9 +3,9 @@ _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 
 /* p5 instance wrapper with bezier convenience functionality */
-class BezierSketch {
+var BezierSketch = class BezierSketch {
 
-  constructor(htmlParentId, p, setupFn, drawFn, htmlBefore, htmlAfter) {
+  constructor(p, htmlParentId, setupFn, drawFn, htmlBefore, htmlCaption) {
     this.p = p;
     this.htmlParentId = htmlParentId;
     this.controls = {};
@@ -26,7 +26,7 @@ class BezierSketch {
       // After the setup function has executed, add before & after html
       $(this.htmlContainer.elt)
         .prepend('<p>'+(htmlBefore ?? '')+'</p>')
-        .append('<div class="caption">'+(htmlAfter ?? '')+'</div>');
+        .append('<div class="caption">'+(htmlCaption ?? '')+'</div>');
     }
 
     // Set `draw` function on p5 instance and bind its scope to `this`
@@ -247,6 +247,7 @@ class BezierSketch {
 
     // Draw control lines
     this.drawEnv('controlLine', function(p) {
+      // TODO refactor duplicate logic with BezierShape.getControlIndices
       // draw first and last control lines
       this.drawLine(pts[0], cpts[0]);
       this.drawLine(pts[pts.length-1], cpts[cpts.length-1]);
@@ -383,11 +384,9 @@ class BezierSketch {
 
 // Factory to create a new bezier sketch attached to `htmlElementId` container.
 // `setupFn` and `drawFn` both take a p5 instance as their only parameter.
-// `htmlAfter` and `htmlBefore` take paragraph content to prepend and append to 
-//   the container, respectively.
-function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlAfter) {
+function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlCaption) {
   return new p5((p) => {
-    new BezierSketch(htmlElementId, p, setupFn, drawFn, htmlBefore, htmlAfter);
+    new BezierSketch(p, htmlElementId, setupFn, drawFn, htmlBefore, htmlCaption);
   });
 };
 
@@ -397,17 +396,19 @@ function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlAft
 
 // Data structure to manage a Bezier shape composed of arbitrarily many
 // Bezier vertices.
-class BezierShape {
-  // `points` and `controlPoints` are nested arrays of (x,y) coords.
-  constructor(pts, cpts) {
+var BezierShape = class BezierShape {
+  // `points` and `controlPoints`: nested arrays of (x,y) coords.
+  // settings: hash of booleans
+  constructor(pts, cpts, settings) {
     this.pts = _.map(pts, (pt) => { return new p5.Vector(pt[0], pt[1]) });
     this.cpts = _.map(cpts, (pt) => { return new p5.Vector(pt[0], pt[1]) });
+    settings = settings ?? {};
+    this.settings = {
+      isSmooth: settings.isSmooth ?? false,
+      // If true, control points do not automatically move with anchor points.
+      areControlPointsAbsolute: settings.areControlPointsAbsolute ?? false,
+    };
   }
-
-  // Returns the ith anchor point, or undefined if it's out of range
-  getAnchorPoint(i) { return this.pts[i]; }
-  // Returns the ith control point, or undefined if it's out of range
-  getControlPoint(i) { return this.cpts[i]; }
 
   // Sets a point given a name denoting either an anchor or control point,
   // e.g. 'p1' or 'cp2'.
@@ -419,12 +420,85 @@ class BezierShape {
     const ind = parseInt(matches[2]);
     if (matches[1] == "c") {
       if (ind >= this.cpts.length) return false;
-      this.cpts[ind] = val;
+      this.setControlPoint(ind, val);
       return true;
     }
     if (ind >= this.pts.length) return false;
-    this.pts[ind] = val;
+    this.setAnchorPoint(ind, val);
     return true;
+  }
+
+  // Sets the value of the ith anchor point, respecting settings.
+  setAnchorPoint(i, val) {
+    // If cpts are absolute, we only need to move the anchor.
+    if (this.settings.areControlPointsAbsolute) {
+      this.pts[i] = val;
+      return;
+    }
+    // Otherwise, translate the control points along with the anchor.
+    let diff = val.sub(this.pts[i]);  // Translation between old and new vals
+    for (const cInd of this.getControlIndices(i)) {
+      // Apply the same translation directly to ctrl pts
+      this.cpts[cInd].add(diff);
+    }
+    this.pts[i].add(diff);
+  }
+  // Get a list containing the indices of the control points attached to
+  // this indexed anchor point.
+  getControlIndices(anchorInd) {
+    if (anchorInd==0) return [0];
+    if (anchorInd==this.pts.length-1) return [this.cpts.length-1];
+    return [2*anchorInd-1, 2*anchorInd];
+  }
+
+  // Sets the value of the ith control point
+  setControlPoint(i, val) {
+    // If smoothness is not enforced, we don't need to change anything else.
+    if (!this.settings.isSmooth) {
+      this.cpts[i] = val;
+      return;
+    }
+    // Otherwise, we'll rotate the other control point to maintain tangency.
+    // Get associated points and indices.
+    // TODO(rfong): tangency is not guaranteed when the bezier shape is 
+    // instantiated. figure out how to do that
+    const aInd = this.getAssociatedAnchorIndex(i),
+          cInd = this.getPairedControlIndex(i);
+    if (cInd != null) {
+      var pt = this.pts[aInd],
+          cp1 = this.cpts[i],
+          cp2 = this.cpts[cInd];
+      // Treating 'pt' as the center, return a p5.Vector pointing to somePoint
+      function getVec(somePoint) {
+        return p5.Vector.sub(somePoint, pt);
+      }
+      // Angle by which the first cp was rotated
+      const angleDiff = getVec(cp1).angleBetween(getVec(val)),
+            dist = pt.dist(cp2),
+            cp2Angle = getVec(cp2).heading();
+      // New position of cp2
+      this.cpts[cInd] = new p5.Vector(
+        dist * Math.cos(cp2Angle + angleDiff) + pt.x,
+        dist * Math.sin(cp2Angle + angleDiff) + pt.y,
+      );
+    }
+
+    // Now set cp1 to the requested value
+    this.cpts[i] = val;
+  }
+  // Get the index of the anchor point associated with this control point.
+  getAssociatedAnchorIndex(ctrlInd) {
+    if (ctrlInd == 0) return 0;
+    if (ctrlInd == this.cpts.length-1) return this.pts.length-1;
+    return Math.ceil(ctrlInd/2.0);
+  }
+  // Get the index of the control point paired with this control point, if
+  // applicable.
+  getPairedControlIndex(ctrlInd) {
+    // The start and end control points are alone.
+    if (ctrlInd == 0 || ctrlInd == this.cpts.length-1) return null;
+    // If it's even, its buddy is -1 down. If it's odd, its buddy is +1 up.
+    return ctrlInd%2==0 ? ctrlInd-1 : ctrlInd+1;
   }
 
   // Add a new Bezier vertex by adding one anchor point and two control points.
@@ -465,26 +539,32 @@ class BezierShape {
 
 // Interactive extension of BezierSketch that tracks a collection of beziers,
 // and allows for click-and-drag modification of beziers.
-class InteractiveBezierSketch extends BezierSketch {
+var InteractiveBezierSketch = class InteractiveBezierSketch extends BezierSketch {
 
   // `bezier` is a BezierShape instance
-  constructor(htmlElementId, p, beziers, htmlBefore, htmlAfter) {
-    super(htmlElementId, p,
+  constructor(p, htmlElementId, beziers, htmlBefore, htmlCaption, settings) {
+    settings = settings ?? {};
+    settings = {
+      background: settings.background ?? '#aaa',
+    };
+
+    super(p, htmlElementId,
       // p5 setup function
       function(p) {
         this.setupHandlers(p);
       },
       // p5 draw function
       function(p){
-        p.background(180,180,255);
+        p.background(this.settings.background);
         // Draw all beziers we are tracking
         for (const bez of this.beziers) {
           this.drawBezierShape(bez.pts, bez.cpts);
         }
       },
-      htmlBefore, htmlAfter,
+      htmlBefore, htmlCaption,
     );
     this.beziers = beziers;
+    this.settings = settings;
   }
 
   /* START mouse event handlers */
@@ -535,9 +615,15 @@ class InteractiveBezierSketch extends BezierSketch {
 
 // Factory to create a new interactive bezier sketch.
 // Parameter specifications similar to above.
-function interactiveBezierSketchFactory(htmlElementId, beziers, htmlBefore, htmlAfter) {
+function interactiveBezierSketchFactory(htmlElementId, beziers, htmlBefore, htmlCaption, settings) {
   return new p5((p) => {
-    new InteractiveBezierSketch(htmlElementId, p, beziers, htmlBefore, htmlAfter);
+    new InteractiveBezierSketch(p, htmlElementId, beziers, htmlBefore, htmlCaption, settings);
   });
 };
 
+// Factory to wrap a p5 instantiation
+function p5SketchFactory(wrapperClass, ...args) {
+  return new p5((p) => {
+    new window[wrapperClass](p, ...args);
+  });
+}
