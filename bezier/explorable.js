@@ -143,9 +143,9 @@ p5SketchFactory('InteractiveBezierSketch', 'p5-container-2',
   <b>p1</b> to make incremental tweaks to the shape without completely 
   changing its character.
   <p>Notice that it's still hard to move the central control points <b>cp1</b> 
-  and <b>cp2</b> without completely changing the character of the curve. This 
-  makes it hard to change the central tilt while keeping the shape smooth in 
-  the middle.</p>
+  and <b>cp2</b> without completely changing the character of the curve.</p>
+  <p>In other words, it's hard to change the central tilt while keeping the 
+  shape smooth in the middle.</p>
   `,
   {background: '#6bd6c7'},
 );
