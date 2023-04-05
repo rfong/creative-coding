@@ -4,7 +4,7 @@
  * section 1
  */
 
-interactiveBezierSketchFactory('p5-container-1', 
+p5SketchFactory('InteractiveBezierSketch', 'p5-container-1', 
   [
     new BezierShape(
       [[100,100], [300,300]],
@@ -24,11 +24,12 @@ interactiveBezierSketchFactory('p5-container-1',
   `
   The <b>"anchor points" (p0 and p1)</b> are the endpoints that the curved line must pass through.
   <p>You can think of the <b>"control points" (cp0 and cp1)</b> as "pulling" the curve more toward them.</p>
+  <p>Also notice that the control lines (white) are tangent to the curve.</p>
   `,
   {background: '#b4b4ff'},
 );
 
-bezierSketchFactory('p5-container-1',
+p5SketchFactory('BezierSketch', 'p5-container-1',
   // p5 setup function
   function(p) {
     this.addControl('p0x', p.createInput(100), 'point0.x');
@@ -86,7 +87,7 @@ bezierSketchFactory('p5-container-1',
  */
 
 /* Sketch with 2 chained cubics */
-interactiveBezierSketchFactory('p5-container-2',
+p5SketchFactory('InteractiveBezierSketch', 'p5-container-2',
   [
     new BezierShape(
       [[50,50], [200,200], [350,350]],
@@ -105,7 +106,7 @@ interactiveBezierSketchFactory('p5-container-2',
 );
 
 /* Sketch where control points follow anchors, but tangency is not fixed */
-interactiveBezierSketchFactory('p5-container-2',
+p5SketchFactory('InteractiveBezierSketch', 'p5-container-2', 
   [
     new BezierShape(
       // Move p1 over a little to illustrate the difference
@@ -124,7 +125,7 @@ interactiveBezierSketchFactory('p5-container-2',
 );
 
 /* Sketch where control points follow anchors and tangency is fixed */
-interactiveBezierSketchFactory('p5-container-2',
+p5SketchFactory('InteractiveBezierSketch', 'p5-container-2', 
   [
     new BezierShape(
       [[50,50], [200,200], [350,350]],

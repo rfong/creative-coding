@@ -2,8 +2,8 @@
 _.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
 
 
-/* p5 instance wrapper with bezier convenience functionality */
 var BezierSketch = class BezierSketch {
+  /* p5 instance wrapper with bezier convenience functionality */
 
   constructor(p, htmlParentId, setupFn, drawFn, htmlBefore, htmlCaption) {
     this.p = p;
@@ -143,8 +143,7 @@ var BezierSketch = class BezierSketch {
       .style('display', 'inline-block')
       .child(this.p.createDiv(
         _.template(`
-          <span class="{{className}}"></span>
-          <label>{{label}}</label>
+          <span class="{{className}}"></span> <label>{{label}}</label>
         `)({
           className: className,
           label: label,
@@ -161,71 +160,6 @@ var BezierSketch = class BezierSketch {
    * Convenience functions for math & drawing
    */
 
-  drawWarpedLine(y,r,theta) {
-    let p = this.p,
-        PI = p.PI,
-        p1 = new p5.Vector(-r*2,y),
-        p2 = new p5.Vector(r*2,y);
-    
-    // draw the unwarped part of the line
-    if (p1.x > -p.width/2) {
-      p.line(-p.width/2,y,p1.x,y);
-    }
-    if (p2.x < p.width/2) {
-      p.line(p.width/2,y,p2.x,y);
-    }
-    
-    if (this.isDebug()) {
-      // draw the start and end points
-      this.drawPoint(p1);
-      this.drawPoint(p2);
-      
-      p.push();
-      
-      // outline the circle we're operating on
-      p.noFill();
-      p.stroke(0,0,255);
-      p.circle(0,0,2*r);
-  
-      // pick out some points on the orbit
-      p.noStroke();
-      p.fill(255,0,0);
-      // 0 is at bottom of circle, moves CCW
-      this.drawPoint(this.getPointOnCircle(r,0));
-      this.drawPoint(this.getPointOnCircle(r,PI/2));
-      this.drawPoint(this.getPointOnCircle(r,-PI/2));
-      
-      p.pop();
-    }
-    
-    /*
-    // big simple curve
-    p.beginShape();
-    p.vertex(p1.x,p1.y);
-    bezierVertex(-r,2*r, r,2*r, p2.x,p2.y);
-    p.endShape();
-    */
-    
-    // bottom arc
-    p.arc(0,0,r*2,r*2, -theta+PI/2,theta+PI/2); // theta=0 appears to face right??
-    
-    // left: smoothly rejoin with the straight line
-    this.drawBezier(
-      p1,
-      this.getPointOnCircle(r, -theta),
-      new p5.Vector(p1.x/2-r/2,p1.y),
-      this.getPointAlongTangentToCircle(r/2, r, -theta),
-    );
-    
-    // right: smoothly rejoin with the straight line
-    this.drawBezier(
-      p2,
-      this.getPointOnCircle(r, theta),
-      new p5.Vector(p2.x/2+r/2,p2.y),
-      this.getPointAlongTangentToCircle(-r/2, r, theta),
-    );
-  }
-
   // unpack p5.Vector coordinates into an array of numbers.
   unpackPoints(points) {
     const coords = [];
@@ -236,6 +170,8 @@ var BezierSketch = class BezierSketch {
     return coords;
   }
 
+  // Given arrays of points and controlPoints, draw a Bezier shape.
+  // TODO: data validation
   drawBezierShape(pts, cpts) {
     let p = this.p;
 
@@ -293,49 +229,6 @@ var BezierSketch = class BezierSketch {
     });
   }
 
-  // Helper that draws a cubic Bezier with helper visualizations.
-  // All arguments are p5.Vector instances.
-  drawBezier(p1,p2, cp1,cp2) {
-    let p = this.p;
-
-    // Visualize control points first (underneath)
-    this.drawEnv('controlPoint', function(p) {
-      this.drawPoint(cp1);
-      this.drawPoint(cp2);
-    });
-
-    this.drawEnv('controlLine', function(p) {
-      p.line(p1.x,p1.y,cp1.x,cp1.y);
-      p.line(p2.x,p2.y,cp2.x,cp2.y);
-    });
-    
-    // Draw bezier line on top
-    this.drawEnv('bezierLine', function(p) {
-      p.bezier(p1.x,p1.y, cp1.x,cp1.y, cp2.x,cp2.y, p2.x,p2.y);
-    });
-    
-    if (!this.isDebug()) return;
-
-    // Draw anchor points on top of line
-    this.drawEnv('anchorPoint', function(p) {
-      this.drawPoint(p1);
-      this.drawPoint(p2);
-    });
-    
-    // Text labels
-    this.drawEnv('label', function(p) {
-      if (this.styles.anchorPoint != null) {
-        this.labelPoint(p1, 'p1');
-        this.labelPoint(p2, 'p2');
-      }
-      if (this.styles.controlPoint != null) {
-        this.labelPoint(cp1, 'cp1');
-        this.labelPoint(cp2, 'cp2');
-      }
-    });
-
-  }
-
   // Helper that draws a label near a point
   labelPoint(point, label) {
     const ts = this.styles.label;
@@ -344,16 +237,6 @@ var BezierSketch = class BezierSketch {
     }
   }
  
-  // Helper that adds a `vertex` and accepts 2d vector
-  addVertex(point) {
-    this.p.vertex(point.x,point.y);
-  }
-
-  // Helper that adds a `bezierVertex` and accepts 2d vectors
-  addBezierVertex(cp1,cp2,point) {
-    this.bezierVertex(cp1.x,cp1.y, cp2.x,cp2.y, point.x,point.y);
-  }
-  
   // Draw a small-radius circle at the given point
   drawPoint(point) {
     this.p.circle(point.x,point.y, this.POINT_RADIUS);
@@ -364,35 +247,7 @@ var BezierSketch = class BezierSketch {
     this.p.line(pt1.x, pt1.y, pt2.x, pt2.y);
   }
   
-  // theta=0 points down
-  getPointOnCircle(r, theta) {
-    return new p5.Vector(r*this.p.sin(theta), r*this.p.cos(theta));
-  }
-  
-  // d = distance along tangent (left)
-  getPointAlongTangentToCircle(d, r, theta) {
-    return new p5.Vector(
-      r*this.p.sin(theta) - d*this.p.cos(theta),
-      r*this.p.cos(theta) + d*this.p.sin(theta),
-    );
-  }
-
-}
-/* ---------------------------------------------------------------------------
- * END BezierSketch class
- */
-
-// Factory to create a new bezier sketch attached to `htmlParentId` container.
-// `setupFn` and `drawFn` both take a p5 instance as their only parameter.
-function bezierSketchFactory(htmlParentId, setupFn, drawFn, htmlBefore, htmlCaption) {
-  return new p5((p) => {
-    new BezierSketch(p, htmlParentId, setupFn, drawFn, htmlBefore, htmlCaption);
-  });
-};
-
-/* ---------------------------------------------------------------------------
- * START interactive extension
- */
+}  // END BezierSketch class
 
 // Data structure to manage a Bezier shape composed of arbitrarily many
 // Bezier vertices.
@@ -539,6 +394,7 @@ var BezierShape = class BezierShape {
 
 // Interactive extension of BezierSketch that tracks a collection of beziers,
 // and allows for click-and-drag modification of beziers.
+// p5 instance wrapper.
 var InteractiveBezierSketch = class InteractiveBezierSketch extends BezierSketch {
 
   // `bezier` is a BezierShape instance
@@ -608,23 +464,12 @@ var InteractiveBezierSketch = class InteractiveBezierSketch extends BezierSketch
     }
   }
   /* END mouse event handlers */
-}
+} // END InteractiveBezierSketch class
 
-/* ---------------------------------------------------------------------------
- * START interactive extension
- */
 
-// Factory to create a new interactive bezier sketch.
-// Parameter specifications similar to above.
-function interactiveBezierSketchFactory(htmlParentId, beziers, htmlBefore, htmlCaption, settings) {
+// Factory convenience method to wrap a p5 instantiation
+function p5SketchFactory(wrapperClassName, ...args) {
   return new p5((p) => {
-    new InteractiveBezierSketch(p, htmlParentId, beziers, htmlBefore, htmlCaption, settings);
-  });
-};
-
-// Factory to wrap a p5 instantiation
-function p5SketchFactory(wrapperClass, ...args) {
-  return new p5((p) => {
-    new window[wrapperClass](p, ...args);
+    new window[wrapperClassName](p, ...args);
   });
 }
