@@ -382,11 +382,11 @@ var BezierSketch = class BezierSketch {
  * END BezierSketch class
  */
 
-// Factory to create a new bezier sketch attached to `htmlElementId` container.
+// Factory to create a new bezier sketch attached to `htmlParentId` container.
 // `setupFn` and `drawFn` both take a p5 instance as their only parameter.
-function bezierSketchFactory(htmlElementId, setupFn, drawFn, htmlBefore, htmlCaption) {
+function bezierSketchFactory(htmlParentId, setupFn, drawFn, htmlBefore, htmlCaption) {
   return new p5((p) => {
-    new BezierSketch(p, htmlElementId, setupFn, drawFn, htmlBefore, htmlCaption);
+    new BezierSketch(p, htmlParentId, setupFn, drawFn, htmlBefore, htmlCaption);
   });
 };
 
@@ -542,16 +542,17 @@ var BezierShape = class BezierShape {
 var InteractiveBezierSketch = class InteractiveBezierSketch extends BezierSketch {
 
   // `bezier` is a BezierShape instance
-  constructor(p, htmlElementId, beziers, htmlBefore, htmlCaption, settings) {
+  constructor(p, htmlParentId, beziers, htmlBefore, htmlCaption, settings) {
     settings = settings ?? {};
     settings = {
       background: settings.background ?? '#aaa',
     };
 
-    super(p, htmlElementId,
+    super(p, htmlParentId,
       // p5 setup function
       function(p) {
         this.setupHandlers(p);
+        this.htmlSelect('canvas').style('cursor', 'pointer');
       },
       // p5 draw function
       function(p){
@@ -615,9 +616,9 @@ var InteractiveBezierSketch = class InteractiveBezierSketch extends BezierSketch
 
 // Factory to create a new interactive bezier sketch.
 // Parameter specifications similar to above.
-function interactiveBezierSketchFactory(htmlElementId, beziers, htmlBefore, htmlCaption, settings) {
+function interactiveBezierSketchFactory(htmlParentId, beziers, htmlBefore, htmlCaption, settings) {
   return new p5((p) => {
-    new InteractiveBezierSketch(p, htmlElementId, beziers, htmlBefore, htmlCaption, settings);
+    new InteractiveBezierSketch(p, htmlParentId, beziers, htmlBefore, htmlCaption, settings);
   });
 };
 

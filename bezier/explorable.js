@@ -70,9 +70,9 @@ bezierSketchFactory('p5-container-1',
     );
   },
   // preface
-  "B-curves are much more annoying to define if you're a programmer working in code instead of using a nice visual interface! Try it below.",
+  "B-curves are much more annoying to define if you're a programmer working in code instead of using a nice visual interface! Here's a simulation of my deeply frustrating experience figuring out how to build the sketches on this page.",
   // caption
-  "This canvas does not have mouse interaction implemented. It's a simulation of my deeply frustrating experience figuring out how to build the interface you see on this page!",
+  "This canvas does not have mouse interaction implemented.",
 );
 
 /* ---------------------------------------------------------------------------
