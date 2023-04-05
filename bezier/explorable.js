@@ -9,6 +9,10 @@ interactiveBezierSketchFactory('p5-container-1',
     new BezierShape(
       [[100,100], [300,300]],
       [[100,300], [300,200]],
+      {
+        areControlPointsAbsolute: true,
+        isSmooth: false,
+      },
     ),
   ],
   // preface
@@ -84,9 +88,7 @@ interactiveBezierSketchFactory('p5-container-2',
     new BezierShape(
       [[50,50], [200,200], [350,350]],
       [[50,200], [200,100], [200,300], [350,250]],
-      {
-          areControlPointsAbsolute: true,
-      },
+      {areControlPointsAbsolute: true},
     ),
   ],
   // preface
