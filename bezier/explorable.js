@@ -16,11 +16,13 @@ interactiveBezierSketchFactory('p5-container-1',
     ),
   ],
   // preface
-  `Below is a single cubic Bezier curve.`,
+  `
+  Below is a single cubic Bezier curve.
+  Drag the points around to get a sense for how different configurations change the shape.
+  `,
   // caption
   `
-  Drag the points around to get a sense for how different configurations change the shape.
-  <p>The <b>"anchor points" (p0 and p1)</b> are the endpoints that the curved line must pass through.</p>
+  The <b>"anchor points" (p0 and p1)</b> are the endpoints that the curved line must pass through.
   <p>You can think of the <b>"control points" (cp0 and cp1)</b> as "pulling" the curve more toward them.</p>
   `,
   {background: '#b4b4ff'},
@@ -83,6 +85,7 @@ bezierSketchFactory('p5-container-1',
  * section 2
  */
 
+/* Sketch with 2 chained cubics */
 interactiveBezierSketchFactory('p5-container-2',
   [
     new BezierShape(
@@ -92,42 +95,46 @@ interactiveBezierSketchFactory('p5-container-2',
     ),
   ],
   // preface
-  `What if we stuck together multiple cubic Beziers to make a more complex contour? Try playing with this new shape.`, 
+  `What if we chained together multiple cubic Beziers to make a more complex contour? Try playing with this new shape.`, 
   // caption
   `
     Move the points around and try to make an elegant new shape.
-    <p>You might notice that it\'s hard to move <b>p1</b> without completely changing the appearance of the curve.</p>
+    <p>You might notice that it\'s hard to move <b>p1</b> without completely changing the character of the curve.</p>
   `,
   {background: '#82ace0'},
 );
 
+/* Sketch where control points follow anchors, but tangency is not fixed */
 interactiveBezierSketchFactory('p5-container-2',
   [
     new BezierShape(
-      [[50,50], [200,200], [350,350]],
-      [[50,200], [200,100], [200,300], [350,250]],
+      // Move p1 over a little to illustrate the difference
+      [[50,50], [150,200], [350,350]],
+      [[50,200], [150,100], [150,300], [350,250]],
     ),
   ],
   // preface
   `In this sketch, control points will follow their associated anchor points. Try moving <b>p1</b> now.`,
   // caption
   `
-  Since the control points move with the anchor points, it's easier to drag around <b>p1</b> to make incremental tweaks to the shape without completely changing its character.
-  <p>However, notice that we still can't easily move around the central control points <b>cp1</b> and <b>cp2</b> without completely changing the character of the curve. This makes it hard to change the central tilt while keeping the shape smooth in the middle.</p>
+  Now that the control points move with the anchor points, it's easier to drag <b>p1</b> to make incremental tweaks to the shape without completely changing its character.
+  <p>Notice that it's still hard to move the central control points <b>cp1</b> and <b>cp2</b> without completely changing the character of the curve. This makes it hard to change the central tilt while keeping the shape smooth in the middle.</p>
   `,
   {background: '#6bd6c7'},
 );
 
+/* Sketch where control points follow anchors and tangency is fixed */
 interactiveBezierSketchFactory('p5-container-2',
   [
     new BezierShape(
       [[50,50], [200,200], [350,350]],
-      [[50,200], [200,100], [200,300], [350,250]],
+      // Rotate the central control handle to illustrate the difference
+      [[50,200], [250,100], [150,300], [350,250]],
       {isSmooth: true},
     ),
   ],
   // preface
-  `If you want the contour to stay smooth in the middle, the control lines attached to <code>p1</code> must make a straight, continuous handle.`,
+  `If you want the contour to stay smooth in the middle, then pairs of control lines must make a straight, continuous handle.`,
   // caption
   `
   In this example, the two control points on either side of <b>p1</b> are fixed to each other to form a single straight control handle. This keeps the curve smooth at <b>p1</b>.
