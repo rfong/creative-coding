@@ -2,5 +2,7 @@ package-lock.json
 node_modules/
 venv
 
+**.css.map
+
 .DS_Store
 **/*/.DS_Store

@@ -8,5 +8,5 @@
 - [the book of shaders](https://thebookofshaders.com/)
 
 ## TODO
-- [ ] include visual previews in the top level gallery 
+- [x] include visual previews in the top level gallery 
 - [ ] add meta embed data for link sharing

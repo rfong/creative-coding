@@ -1,0 +1,50 @@
+/* styles for creative-coding top-level index page */
+
+body
+  max-width: 810px
+
+.header
+  text-align: center
+  max-width: 790px
+  margin: 30px
+
+.previews-container
+  margin: 0 auto
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  justify-content: center
+
+$img-size: 250px
+$info-height: 120px
+
+.sketch-preview
+
+  width: $img-size
+
+  margin: 10px
+
+  .sketch-image
+    display: block
+    width: $img-size
+    height: $img-size
+    background: #ccc  // some default bg color if no valid imgurl
+    background-size: cover
+    background-position: center
+
+  .sketch-info-container
+    display: block
+    width: $img-size - 40px
+    height: $info-height
+    padding: 20px
+    background: rgba(255,255,255,0.4)
+
+    .sketch-title, .sketch-description, .sketch-date
+    .sketch-title
+    .sketch-description, .sketch-date
+      color: rgba(0,0,0,0.5)
+    .sketch-date
+      font-style: italic
+
+li
+  color: #666

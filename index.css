@@ -1,0 +1,50 @@
+/* styles for creative-coding top-level index page */
+body {
+  max-width: 810px;
+}
+
+.header {
+  text-align: center;
+  max-width: 790px;
+  margin: 30px;
+}
+
+.previews-container {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sketch-preview {
+  width: 250px;
+  margin: 10px;
+}
+.sketch-preview .sketch-image {
+  display: block;
+  width: 250px;
+  height: 250px;
+  background: #ccc;
+  background-size: cover;
+  background-position: center;
+}
+.sketch-preview .sketch-info-container {
+  display: block;
+  width: 210px;
+  height: 120px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.4);
+}
+.sketch-preview .sketch-info-container .sketch-description, .sketch-preview .sketch-info-container .sketch-date {
+  color: rgba(0, 0, 0, 0.5);
+}
+.sketch-preview .sketch-info-container .sketch-date {
+  font-style: italic;
+}
+
+li {
+  color: #666;
+}
+
+/*# sourceMappingURL=index.css.map */

@@ -1,4 +1,9 @@
-html, body {
+html {
+  display: flex;
+  justify-content: center;
+}
+
+body {
   position: relative;
   margin: 0;
   padding: 20px;

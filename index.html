@@ -1,50 +1,32 @@
 <!doctype html>
-<html>
+<html lang="en"
+      ng-app="myApp"
+      ng-controller="myCtrl" >
 <head>
   <link rel="stylesheet" href="style.css"/>
-  <style>
-    li {
-      color: #666;
-    }
-  </style>
+  <link rel="stylesheet" href="index.css"/>
+
+  <!-- Vendor scripts -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/jquery.min.js"></script>
+  <script src="lib/angular-1.2.32.min.js"></script>
+  <script src="lib/angular-sanitize.js"></script>
+
+  <!-- Page scripts -->
+  <script type="text/javascript" src="index.js"></script>
+
 </head>
 <body>
 
-  <h1>creative-coding sketches</h1>
-  Two hours. One prompt. Okay, sometimes multiple prompts. A collection of spontaneous sketches I've made at Recurse Center's weekly creative coding meetup.
+  <div class="header">
+    <h1>rfong's creative-coding sketches</h1>
+    <p>Two hours. One prompt. Okay, sometimes multiple prompts. A collection of spontaneous & sometimes silly sketches I've made at Recurse Center's weekly creative coding meetup.</p>
+    <p>(Related: <a href="https://rfong.github.io/rflog/">my coding blog</a>)</p>
+  </div>
 
-  <h3>2023</h3>
-  <ul>
-    <li><a href="noita">noita sandbox</a> - pixel particle simulator</li>
-    <li><a href="twin-tendrils">twin tendrils</a> - animated Bezier tendrils trying to touch</li>
-    <li><a href="event-horizon">event horizon</a> - bezier visualizer for a totally inaccurate black hole</li>
-    <li><a href="bezier">bezier</a> - a visual explorable to get intuition for Bezier curves</li>
-  </ul>
-
-  <h3>2022</h3>
-  <ul>
-    <li><a href="kaleidoface">kaleidoface</a> - body horror kaleidoscope webcam</li>
-    <li><a href="emojistalker">emoji stalker</a> - don't look back</li>
-  </ul>
-
-  <h3>2021</h3>
-  <ul>
-    <li><a href="doodler">minimum viable doodler</a> - crappy MS Paint</li>
-    <li><a href="reveal">reveal the image</a> - fun patterns, peel the mask off an image</li>
-    <li><a href="skymap">skymap</a> - ASCII world map shader</li>
-    <li><a href="langmap">langmap</a> - IPA geographic visualizer w/ shader</li>
-    <li><a href="slimebug">procedural slime bugs</a> - featuring "absolute butt coordinates"</li>
-    <li><a href="asciicam">ASCIIcam</a> - webcam to ascii</li>
-    <li><a href="ghostlines">ghost lines</a> - mass-based webcam motion trace</li>
-    <li><a href="threejs/terrain_raycast.html">terrain colors</a> - webGL terrain raycasting</li>
-    <li><a href="dithercam">dithercam</a> - webcam to b&w dither</li>
-  </ul>
-
-  <hr/>
-  
-  <p>
-    <a href="https://rfong.github.io/rflog/">my coding blog</a>
-  </p>
+	<div class="previews-container">
+  	<div sketch-preview ng-repeat="sketch in sketches" sketch="sketch"></div>
+  </div>
 
 </body>
 </html>

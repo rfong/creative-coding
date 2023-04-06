@@ -1,0 +1,100 @@
+{"sketches": [
+  {
+    "title": "bezier",
+    "url": "bezier",
+    "imgUrl": "preview.png",
+    "description": "a visual explorable to get intuition for Bezier curves",
+    "date": "apr 3-4, 2023"
+  },
+  {
+    "title": "event horizon",
+    "url": "event-horizon",
+    "imgUrl": "preview.png",
+    "description": "Bezier visualizer for a totally inaccurate black hole",
+    "date": "mar 30, 2023"
+  },
+  {
+    "title": "twin tendrils",
+    "url": "twin-tendrils",
+    "imgUrl": "preview.png",
+    "description": "animated Bezier tendrils trying to touch",
+    "date": "mar 16, 2023"
+  },
+  {
+    "title": "noita sandbox",
+    "url": "noita",
+    "imgUrl": "preview.png",
+    "description": "pixel particle simulator",
+    "date": "mar 9, 2023"
+  },
+  {
+    "title": "emoji stalker",
+    "url": "emojistalker",
+    "imgUrl": "preview.png",
+    "description": "don't look back",
+    "date": "apr 7, 2022"
+  },
+  {
+    "title": "dithercam",
+    "url": "dithercam",
+    "imgUrl": "preview.png",
+    "description": "b&w dithered webcam filter",
+    "date": "oct 14, 2021"
+  },
+  {
+    "title": "terrain colors",
+    "url": "threejs/terrain_raycast.html",
+    "imgUrl": "../preview.png",
+    "description": "webGL raycasting of procedurally generated terrain colored by height",
+    "date": "jul 21, 2021"
+  },
+  {
+    "title": "ghostlines",
+    "url": "ghostlines",
+    "imgUrl": "preview.gif",
+    "description": "mass-based webcam motion tracer",
+    "date": "jul 14, 2021"
+  },
+  {
+    "title": "asciicam",
+    "url": "asciicam",
+    "imgUrl": "preview.png",
+    "description": "ASCII webcam filter",
+    "date": "jul 7, 2021"
+  },
+  {
+    "title": "procedural slime bugs",
+    "url": "slimebug",
+    "imgUrl": "preview.png",
+    "description": "bugs leaving slime trails via \"absolute butt coordinates\"",
+    "date": "jun 30, 2021"
+  },
+  {
+    "title": "langmap",
+    "url": "langmap/dist",
+    "imgUrl": "../preview.png",
+    "description": "interactive IPA geographic visualizer with GLSL shader and masking",
+    "date": "jun 16, 2021"
+  },
+  {
+    "title": "skymap",
+    "url": "skymap/dist",
+    "imgUrl": "../preview.png",
+    "description": "ASCII world map with GLSL shader",
+    "date": "jun 9, 2021"
+  },
+  {
+    "title": "reveal the image",
+    "url": "reveal",
+    "imgUrl": "preview.png",
+    "description": "peel off an image mask with a prime sieve",
+    "date": "may 26, 2021"
+  },
+  {
+    "title": "minimum viable doodler",
+    "url": "doodler",
+    "imgUrl": "preview.png",
+    "description": "crappy MS paint",
+    "date": "may 19, 2021"
+  }
+]}
