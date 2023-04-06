@@ -42,7 +42,7 @@ var BezierSketch = class BezierSketch {
    * p5 style management helpers
    */
 
-  POINT_RADIUS = 5;
+  POINT_RADIUS = 7;
 
   // If undefined, don't change anything (default to current p5 settings)
   styles = {
