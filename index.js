@@ -35,7 +35,7 @@ app.directive('sketchPreview', function() {
     },
     template: (`
     <div class="sketch-preview">
-      <div class="sketch-image" style="background-image: url('{{sketch.url}}/{{sketch.imgUrl}}')"></div>
+      <a href="{{sketch.url}}"><div class="sketch-image" style="background-image: url('{{sketch.url}}/{{sketch.imgUrl}}')"></div></a>
 		  <div class="sketch-info-container">
         <div class="sketch-title"><a href="{{sketch.url}}">{{sketch.title}}</a></div>
         <div class="sketch-description">{{sketch.description}}</div>
