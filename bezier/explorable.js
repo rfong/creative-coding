@@ -111,14 +111,15 @@ p5SketchFactory('InteractiveBezierSketch', 'p5-container-2',
   ],
   // preface
   `
-  1. What if we chained together multiple cubic Beziers to make a more complex 
+  <h3>1. Naive implementation</h3>
+  What if we chained together multiple cubic Beziers to make a more complex 
   contour? Try playing with this new shape.
   `, 
   // caption
   `
   Move the points around and try to make an elegant new shape.
-  <p>You might notice that it\'s hard to move <b>p1</b> without completely 
-  changing the character of the curve.</p>
+  <p>You might notice that it\'s hard to move points around without completely 
+  changing the visual character of the curve.</p>
   `,
   {background: '#82ace0'},
 );
@@ -134,14 +135,15 @@ p5SketchFactory('InteractiveBezierSketch', 'p5-container-2',
   ],
   // preface
   `
-  2. In this sketch, when you move an anchor point, the associated control 
-  points will follow it. Try moving <b>p1</b> now.
+  <h3>2. Transform control points when anchor point moves</h3>
+  In this sketch, when you move an anchor point, the associated control 
+  points will move with it. Try moving <b>p1</b> now.
   `,
   // caption
   `
-  Now that the control points move with the anchor points, it's easier to drag 
-  <b>p1</b> to make incremental tweaks to the shape without completely 
-  changing its character.
+  Now that the control points are locked relative to their anchor points, it's 
+  easier to drag <b>p1</b> to make incremental tweaks to the shape without 
+  completely changing its character.
   <p>Notice that it's still hard to move the central control points <b>cp1</b> 
   and <b>cp2</b> without completely changing the character of the curve.</p>
   <p>In other words, it's hard to change the central tilt while keeping the 
@@ -162,8 +164,10 @@ p5SketchFactory('InteractiveBezierSketch', 'p5-container-2',
   ],
   // preface
   `
-  3. In this sketch, paired control points are locked to stay collinear with 
-  their associated anchor point. Try moving the middle control points now.
+  <h3>3. Control points locked collinearly at junctions</h3>
+  In this sketch, <b>cp1</b> and <b>cp2</b> are locked to stay collinear with 
+  each other. Try moving the middle control points. Things should now behave 
+  as you would intuitively expect.
   `,
   // caption
   `
